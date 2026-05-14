@@ -10,4 +10,4 @@ Contents:
 
 ## AI-assisted
 
-Portions of this repository were authored or edited with the assistance of AI tools (e.g., Claude Code). All committed content has been reviewed by the repository owner.
+Portions of this repository were authored or edited with the assistance of AI tools (e.g., Claude Code).

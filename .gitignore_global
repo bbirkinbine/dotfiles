@@ -14,6 +14,7 @@
 # --- Secrets (belt-and-suspenders — per-repo .gitignore should also have these) ---
 .env
 .env.*
+!.env.*.example
 !.env.example
 .envrc
 !.envrc.example

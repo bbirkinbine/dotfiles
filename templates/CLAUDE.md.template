@@ -1,4 +1,4 @@
-# CLAUDE.md — dotfiles
+# CLAUDE.md — {{REPO_NAME}}
 
 > **Purpose.** Persistent project context for Claude Code (and other AI
 > coding agents) working in this repository. Read this before suggesting
@@ -9,13 +9,9 @@
 
 ## What this repo is
 
-Personal shell and development-environment dotfiles for macOS — `.zshrc`,
-`.zprofile`, `.gitconfig`, `.gitignore_global` — plus a `templates/`
-directory of reusable boilerplate (`CLAUDE.md`, `README.md`, GitHub About
-checklist, new-project checklist) used when bootstrapping new repos under
-`~/Downloads/src/`.
+{{ONE_PARAGRAPH_DESCRIPTION}}
 
-This repo is **public** on GitHub (`github.com/bbirkinbine/dotfiles`).
+This repo is **public** on GitHub (`github.com/bbirkinbine/{{REPO_NAME}}`).
 Treat every change as world-readable: file contents, commit messages,
 branch names, PR descriptions, and issue text are all indexed by search
 engines. No secrets, no internal hostnames, no work-related context.
@@ -24,39 +20,9 @@ engines. No secrets, no internal hostnames, no work-related context.
 
 ## Stack / scope
 
-zsh + git on macOS (Apple Silicon, Homebrew). No build, no test suite, no
-deploy target — files here are consumed in place by the shell and by git.
-The `templates/` directory is the project-bootstrap surface; changes
-there propagate (by copy) to every new repo created from this machine, so
-treat edits in `templates/` as standards-setting rather than ad-hoc.
+{{LIST_THE_PRIMARY_TOOLS_AND_LANGUAGES — e.g. Python 3.12 + uv + pytest, or Packer + Tart + qemu, or Ansible + OpenTofu}}
 
-**Out of scope:** machine-specific config (anything that wouldn't be safe
-on the open internet, anything that only makes sense on one host),
-application configs that maintain their own versioning under
-`~/.config/<tool>/`, and work-related aliases, hostnames, or shortcuts.
-Anything machine-specific belongs in a local untracked override, not
-here.
-
----
-
-## Commits and pushes require explicit approval
-
-Don't run `git commit` or `git push` without an explicit "commit" or
-"push" instruction from the user in this conversation. Phrases like
-"looks good," "the diff is clean," or "ready to ship" are **not**
-approval — they're acknowledgement that the change is correct, not
-permission to write history.
-
-The workflow is: make the change, show `git status` and `git diff`,
-then wait. Each commit needs its own sign-off; prior approval applies
-to *that* commit, not to follow-up commits in the same session.
-
-Pushes are gated more tightly than commits:
-
-- Never push without being explicitly asked.
-- Never push to `main` (or any protected branch) on the strength of an
-  ambiguous "push it" — confirm the target branch first.
-- Never use `--force` or `--force-with-lease` without a direct ask.
+{{WHAT_THIS_REPO_DOES_NOT_DO — explicit out-of-scope items, especially adjacent things someone might assume belong here}}
 
 ---
 
@@ -137,49 +103,57 @@ contents:
 - Author email on early commits. If a clone on a different machine had
   the wrong global `user.email`, every commit before the fix carries
   it. Verify before the first commit — see
-  [`templates/new-project-checklist.md`](templates/new-project-checklist.md).
+  [`new-project-checklist.md`](https://github.com/bbirkinbine/dotfiles/blob/main/templates/new-project-checklist.md).
 - CI logs. Echoed env vars, full filesystem paths, and stack traces are
   all visible to anyone the moment the repo is public.
 - Screenshots embedded in PRs or `docs/`. Crop or blur anything showing
   real data, real hostnames, or filesystem layout.
 
-The pre-flip checklist in
-[`templates/new-project-checklist.md`](templates/new-project-checklist.md)
-applies here too — pre-flip scrubbing is cheap; post-flip scrubbing is
-expensive and incomplete.
+If the repo is currently private and a flip to public is on the table,
+walk the pre-flip checklist in
+[`new-project-checklist.md`](https://github.com/bbirkinbine/dotfiles/blob/main/templates/new-project-checklist.md)
+before clicking "Change visibility." Pre-flip scrubbing is cheap; post-flip
+scrubbing is expensive and incomplete.
 
 ---
 
 ## Validation gates before claiming done
 
-No build or test cycle. Sanity checks for any change:
+{{LANGUAGE_SPECIFIC_VALIDATION_COMMANDS — fill in for this repo, e.g.:}}
 
 ```bash
-zsh -n .zshrc                          # syntax check
-zsh -n .zprofile                       # syntax check
-git config --file .gitconfig --list    # confirms .gitconfig parses
+# Python (uv-managed)
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src/
+uv run pytest
+
+# Or shell scripts
+bash -n scripts/*.sh
+shellcheck scripts/*.sh
+
+# Or Packer
+packer init .
+packer fmt -check .
+packer validate .
 ```
 
 Don't claim a change is "ready" without at least:
 
-1. A clean run of the checks above for the affected file(s).
-2. An updated `README.md` if the change affects how the repo is used or
-   what it contains (e.g., a new top-level file or a new section).
+1. A clean run of the gates above for the affected file(s).
+2. An updated README if the change affects how the project builds or runs.
 
 ---
 
 ## Don't touch
 
-- `.git/` — obviously.
-- Files in `templates/` are standards-setting: a change there propagates
-  to every new repo bootstrapped from this machine. Edit deliberately
-  and explain the rationale in the commit message; don't tweak template
-  language casually.
+{{LIST_OF_FILES_OR_DIRS_THAT_ARE_LOAD_BEARING — e.g. vendored upstream
+files, generated artifacts, lockfile-adjacent config sections. Empty list
+is fine if there's nothing special.}}
 
 ---
 
-## Open work / current state (updated 2026-05-14)
+## Open work / current state (updated {{YYYY-MM-DD}})
 
-Stable. Updates are infrequent — usually a new tool added to `PATH` or
-an alias change. The `templates/` directory is the more active surface
-as the project-bootstrap pattern evolves.
+{{WHAT'S_DONE, WHAT'S_NEXT, WHAT'S_BLOCKED — keep this section short and
+prune it as state changes.}}

@@ -1,7 +1,7 @@
 # New project checklist (dotfiles mirror)
 
 The authoritative version of this checklist lives in the Obsidian vault
-at `Engineering/New Project Setup.md`. This copy is mirrored here so the
+at `Research/Programming/New Project Setup.md`. This copy is mirrored here so the
 dotfiles repo stands alone on a machine without the vault checked out.
 
 ## At repo creation
@@ -18,12 +18,48 @@ dotfiles repo stands alone on a machine without the vault checked out.
       `~/Downloads/src/dotfiles/.gitconfig`); a wrong value means either
       the global got overridden or a per-repo `.git/config` is shadowing
       it.
+
+### If this is a Python project — use the agentic-workflow scaffolding
+
+- [ ] Run the Python bootstrap:
+      ```
+      bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
+      ```
+      This drops in CLAUDE.md, AGENTS.md, pyproject.toml,
+      .pre-commit-config.yaml, the `.claude/` tree (settings.json +
+      planner/test-first/reviewer subagents + python-module-split
+      skill; opt-in subagents under `.claude/agents/optional/` are not
+      copied), and `docs/specs/README.md`. Existing files are skipped,
+      not overwritten.
+- [ ] Replace every `{{PLACEHOLDER}}` in the copied files:
+      ```
+      rg '\{\{' .
+      ```
+      No `{{` markers should be left after this pass.
+- [ ] Copy [`README.md.template`](README.md.template) → `./README.md`
+      and fill in placeholders. The Python bootstrap doesn't copy the
+      README because it's the same across all repo flavors. **Do not
+      remove the Acknowledgements section** — that's the single
+      attribution surface.
+- [ ] Install dev environment:
+      ```
+      uv sync
+      uv run pre-commit install
+      ```
+- [ ] Write your first spec: `docs/specs/0001-<feature>.md`. See
+      `docs/specs/README.md` (copied by bootstrap) for the convention.
+
+### If this is a non-Python repo (infra, FPGA, shell, etc.)
+
 - [ ] Copy [`CLAUDE.md.template`](CLAUDE.md.template) → `./CLAUDE.md`,
       fill in placeholders, delete the validation-gates block that
       doesn't apply to this repo's stack.
 - [ ] Copy [`README.md.template`](README.md.template) → `./README.md`,
       fill in placeholders. **Do not remove the Acknowledgements
       section** — that's the single attribution surface.
+
+### Both flavors
+
 - [ ] Add a `LICENSE` file (MIT for personal projects unless there's a
       reason otherwise).
 - [ ] Add `.gitignore` — start from `~/.gitignore_global` (covered by

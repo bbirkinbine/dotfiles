@@ -1,0 +1,69 @@
+# --- OS / editor ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- Secrets (belt-and-suspenders — per-repo .gitignore should also have these) ---
+.env
+.env.*
+!.env.example
+.envrc
+!.envrc.example
+*.pem
+*.key
+id_ed25519-homelab
+id_rsa
+id_rsa.b
+id_ed25519
+*.pfx
+*.p12
+credentials.json
+service-account*.json
+secrets.yaml
+secrets.yml
+secrets.json
+*.secrets
+*.dec.yaml
+*.dec.yml
+
+# --- Terraform / OpenTofu ---
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+.terraform/
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# commit .terraform.lock.hcl — pins providers
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+.env.local
+
+# --- Ansible ---
+*.retry
+ansible.log
+
+# --- Node ---
+node_modules/
+
+# --- Usually local-only ---
+.direnv/
+.python-version
+.tool-versions
+

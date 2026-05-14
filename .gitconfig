@@ -1,0 +1,25 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+    name = Brian Birkinbine
+	email = 585281+bbirkinbine@users.noreply.github.com
+[init]
+    defaultBranch = main
+[pull]
+    rebase = true
+[push]
+    autoSetupRemote = true
+[merge]
+    conflictstyle = zdiff3
+[diff]
+    algorithm = histogram
+[alias]
+    s = status -sb
+    co = checkout
+    br = branch
+    lg = log --oneline --graph --decorate --all
+[core]
+	excludesfile = ~/.gitignore_global

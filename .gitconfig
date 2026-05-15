@@ -10,16 +10,27 @@
     defaultBranch = main
 [pull]
     rebase = true
+[rebase]
+    autoStash = true
+    autoSquash = true
 [push]
     autoSetupRemote = true
+[fetch]
+    prune = true
 [merge]
     conflictstyle = zdiff3
 [diff]
     algorithm = histogram
+[commit]
+    verbose = true
+[branch]
+    sort = -committerdate
 [alias]
     s = status -sb
     co = checkout
     br = branch
     lg = log --oneline --graph --decorate --all
+[help]
+    autocorrect = prompt
 [core]
 	excludesfile = ~/.gitignore_global

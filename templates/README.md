@@ -9,17 +9,31 @@ should use the full agentic-workflow scaffolding) or something else
 
 ### Python projects — use [`python/`](python/)
 
-The full agentic-workflow scaffolding: CLAUDE.md with the
-Spec → Plan → Test-first → Implement → Verify loop wired up, the three
-subagents (planner, test-first, reviewer), the python-module-split
-skill, the PostToolUse hook (ruff + mypy), pyproject.toml, pre-commit,
-and a docs/specs/ convention.
+The full agentic-workflow scaffolding:
+
+- `CLAUDE.md` with the Spec → Plan → Test-first → Implement → Verify
+  loop wired up.
+- `WORKFLOW.md` — the human-facing loop walkthrough (day-zero setup,
+  per-feature loop, where it goes wrong if you skip steps).
+- Default subagents: `planner`, `test-first`, `reviewer`.
+- Opt-in subagents under `.claude/agents/optional/` (not auto-copied):
+  `security-reviewer`, `performance-reviewer`.
+- Slash commands under `.claude/commands/`: `/spec`, `/plan`,
+  `/test-first`, `/review-check`, `/review`, `/security`,
+  `/performance` — muscle-memory entry points to the loop.
+- Skills under `.claude/skills/`: `python-module-split`,
+  `python-docstrings`, `dependency-hygiene` — auto-invoked from the
+  diff.
+- PostToolUse hook running ruff format + ruff check + mypy on every
+  Edit/Write.
+- `pyproject.toml`, `.pre-commit-config.yaml`, `docs/specs/` convention.
 
 Run [`python/bootstrap.sh`](python/bootstrap.sh) from a new repo's
 root and everything drops into place.
 
 See [`python/README.md`](python/README.md) for the full inventory and
-the agentic-loop mapping.
+the agentic-loop mapping, and [`python/WORKFLOW.md`](python/WORKFLOW.md)
+for the human-facing walkthrough.
 
 ### Non-Python repos — use the top-level templates
 

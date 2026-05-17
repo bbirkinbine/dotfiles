@@ -13,4 +13,4 @@ Contents:
 
 ## AI-assisted
 
-Portions of this repository were authored or edited with the assistance of AI tools (e.g., Claude Code).
+Portions of this repository were authored or edited with the assistance of AI tools.

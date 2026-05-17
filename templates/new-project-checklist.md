@@ -25,12 +25,20 @@ dotfiles repo stands alone on a machine without the vault checked out.
       ```
       bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
       ```
-      This drops in CLAUDE.md, AGENTS.md, pyproject.toml,
+      This drops in CLAUDE.md, WORKFLOW.md, pyproject.toml,
       .pre-commit-config.yaml, the `.claude/` tree (settings.json +
-      planner/test-first/reviewer subagents + python-module-split
-      skill; opt-in subagents under `.claude/agents/optional/` are not
-      copied), and `docs/specs/README.md`. Existing files are skipped,
-      not overwritten.
+      planner/test-first/reviewer subagents + the slash-command set
+      under `.claude/commands/` + the python-module-split /
+      python-docstrings / dependency-hygiene skills), and
+      `docs/specs/README.md`. Opt-in subagents under
+      `.claude/agents/optional/` (security-reviewer,
+      performance-reviewer) are not copied — see
+      `templates/python/README.md` for when to enable each. Existing
+      files are skipped, not overwritten.
+- [ ] Read [`templates/python/WORKFLOW.md`](python/WORKFLOW.md) (copied
+      into the new project's root as `WORKFLOW.md`) — the human-facing
+      loop walkthrough with day-zero setup, per-feature loop, and where
+      it goes wrong if you skip steps.
 - [ ] Replace every `{{PLACEHOLDER}}` in the copied files:
       ```
       rg '\{\{' .

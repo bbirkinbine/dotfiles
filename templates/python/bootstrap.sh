@@ -7,7 +7,7 @@
 #   bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
 #
 # What it does:
-#   - Copies CLAUDE.md, AGENTS.md, pyproject.toml, .pre-commit-config.yaml
+#   - Copies CLAUDE.md, WORKFLOW.md, pyproject.toml, .pre-commit-config.yaml
 #     into the current directory (verbatim, with {{PLACEHOLDER}} slots).
 #   - Copies the .claude/ tree: settings.json + the three default subagents
 #     (planner / test-first / reviewer) + the python-module-split skill.
@@ -19,7 +19,7 @@
 #   - Will NOT overwrite existing files; prints a warning and skips each one.
 #
 # After running:
-#   1. Walk the {{PLACEHOLDER}} slots in CLAUDE.md, AGENTS.md, pyproject.toml.
+#   1. Walk the {{PLACEHOLDER}} slots in CLAUDE.md, pyproject.toml.
 #      Verify with: rg '\{\{' .
 #   2. Walk the rest of ~/Downloads/src/dotfiles/templates/new-project-checklist.md
 #      for the README.md acknowledgement, GitHub About sidebar, and identity check.
@@ -60,32 +60,59 @@ copy() {
 }
 
 copy CLAUDE.md
-copy AGENTS.md
+copy WORKFLOW.md
 copy pyproject.toml
 copy .pre-commit-config.yaml
 copy .claude/settings.json
 copy .claude/agents/planner.md
 copy .claude/agents/test-first.md
 copy .claude/agents/reviewer.md
+copy .claude/commands/spec.md
+copy .claude/commands/plan.md
+copy .claude/commands/test-first.md
+copy .claude/commands/review-check.md
+copy .claude/commands/review.md
+copy .claude/commands/security.md
+copy .claude/commands/performance.md
 copy .claude/skills/python-module-split/SKILL.md
+copy .claude/skills/python-docstrings/SKILL.md
+copy .claude/skills/dependency-hygiene/SKILL.md
 copy docs/specs/README.md
 
 # Intentionally NOT copied (opt-in per project):
-#   .claude/agents/optional/security-reviewer.md  — copy manually when the
-#   project has a network surface, auth, or processes untrusted input.
+#   .claude/agents/optional/security-reviewer.md     — for projects with a network
+#     surface, auth, untrusted input, secrets, or external deserialization.
+#   .claude/agents/optional/performance-reviewer.md  — for projects with a hot path,
+#     DB queries on user-sized data, async code, migrations on large tables, or any
+#     latency SLO.
 #   See $SRC_DIR/.claude/agents/optional/ for what's available.
 
 echo
 echo "Done. Next steps:"
+echo "  0. Read WORKFLOW.md — the loop walkthrough with worked examples."
 echo "  1. Replace placeholders:  rg '\\{\\{' . | head"
 echo "  2. Walk the rest of the new-project checklist:"
 echo "     ~/Downloads/src/dotfiles/templates/new-project-checklist.md"
 echo "  3. Install dev environment:"
 echo "     uv sync && uv run pre-commit install"
-echo "  4. Write your first spec:  docs/specs/0001-<feature>.md"
+echo "  4. Write your first spec:  /spec <feature name>  (or by hand at docs/specs/0001-<feature>.md)"
 echo "  5. For per-subdir CLAUDE.md files:"
 echo "     cp $SRC_DIR/subdir-CLAUDE.md.example src/<area>/CLAUDE.md"
 echo "  6. If this project has a network surface, auth, or processes"
 echo "     untrusted input, add the opt-in security-reviewer:"
 echo "     cp $SRC_DIR/.claude/agents/optional/security-reviewer.md \\"
 echo "        .claude/agents/security-reviewer.md"
+echo "  7. If this project has a hot path, async code, DB queries on"
+echo "     user-sized data, or a latency SLO, add the opt-in"
+echo "     performance-reviewer:"
+echo "     cp $SRC_DIR/.claude/agents/optional/performance-reviewer.md \\"
+echo "        .claude/agents/performance-reviewer.md"
+echo
+echo "Workflow loop (slash commands installed in .claude/commands/):"
+echo "  /spec <name>    create a spec under docs/specs/"
+echo "  /plan           invoke the planner subagent on the latest spec"
+echo "  /test-first     invoke the test-first subagent"
+echo "  /review-check   run the local quality gate (ruff, format, mypy, pytest)"
+echo "  /review         invoke the reviewer subagent on the current diff"
+echo "  /security       invoke security-reviewer (if installed)"
+echo "  /performance    invoke performance-reviewer (if installed)"

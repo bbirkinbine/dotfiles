@@ -42,7 +42,9 @@ hygiene" section below.
 
 This is the agentic loop documented in
 `Research/Programming/Agentic Programming/02 Agentic Methodology Loop.md`
-in my Obsidian vault. Honor each phase — don't run open-ended.
+in my Obsidian vault. The human-facing walkthrough with worked examples
+lives in `WORKFLOW.md` at the repo root. Honor each phase — don't run
+open-ended.
 
 - **Spec.** Before any non-trivial work, write a short spec under
   `docs/specs/NNNN-<feature>.md` (see `docs/specs/README.md` for the
@@ -56,9 +58,12 @@ in my Obsidian vault. Honor each phase — don't run open-ended.
   failing-test output. Only then proceed to implementation.
 - **Implement.** Main session writes the minimum code to make the
   tests pass.
-- **Verify.** Use the `reviewer` subagent on the diff before commit. It
-  has not seen the implementation reasoning and reads only the diff +
-  spec.
+- **Verify.** Before invoking the `reviewer` subagent, run
+  `/review-check` to confirm the local quality gate passes (ruff lint,
+  ruff format, mypy, pytest). Then use the `reviewer` subagent on the
+  diff. It has not seen the implementation reasoning and reads only the
+  diff + spec. Add `/security` and/or `/performance` if the relevant
+  opt-in subagent is installed and the diff trips its triggers.
 - If a change would touch > 5 files, stop and ask first.
 
 ## Subagents (in `.claude/agents/`)
@@ -67,18 +72,65 @@ in my Obsidian vault. Honor each phase — don't run open-ended.
 - `test-first` — writes failing pytest tests from a spec; never writes
   implementation.
 - `reviewer` — independent diff reviewer; checks spec match, test
-  quality, edge cases.
+  quality, edge cases, file size, public-repo hygiene.
+
+Opt-in subagents (copy from
+`~/Downloads/src/dotfiles/templates/python/.claude/agents/optional/`
+into `.claude/agents/` per project):
+
+- `security-reviewer` — application-security review of a diff. Enable
+  when the project has a network surface, auth, processes untrusted
+  input, handles secrets, or deserializes external data.
+- `performance-reviewer` — performance review of a diff (N+1, accidental
+  O(n²), sync I/O in async, missing pagination, allocation churn,
+  migration-locking patterns). Enable when the project has a hot path,
+  DB queries on user-sized data, or runs under load.
 
 ## Skills (in `.claude/skills/`)
 
 - `python-module-split` — auto-invoked when a `.py` file approaches 300
   lines. Splits a module into a package while preserving the public API.
+- `python-docstrings` — auto-invoked when a new public function, class,
+  or module is added or touched. Enforces Google-style docstrings; bans
+  tautological docs and missing `Raises:` sections.
+- `dependency-hygiene` — auto-invoked when a new entry is added to
+  `[project] dependencies` or `[tool.uv] dev-dependencies` in
+  `pyproject.toml`. Flags abandoned packages, single-maintainer risk,
+  license conflicts, stdlib alternatives, and advisories before the
+  dep is added.
+
+## Slash commands (in `.claude/commands/`)
+
+One-keystroke entry points to the workflow loop. The commands invoke
+the subagents and quality gate so the methodology is muscle memory
+instead of manual invocation.
+
+- `/spec <feature name>` — creates `docs/specs/NNNN-<slug>.md` with
+  goal / success / non-goals scaffolding; stops there for human edit.
+- `/plan [spec-path]` — invokes the `planner` subagent on the named
+  spec, or the most recent one if blank.
+- `/test-first [spec-path]` — invokes the `test-first` subagent.
+- `/review [<base>..<head>]` — invokes the `reviewer` subagent on the
+  current diff (or the named range).
+- `/security [<base>..<head>]` — invokes `security-reviewer` if
+  installed; otherwise tells you how to enable it.
+- `/performance [<base>..<head>]` — invokes `performance-reviewer` if
+  installed; otherwise tells you how to enable it.
+- `/review-check` — runs the local quality gate (ruff lint, ruff
+  format, mypy, pytest) and refuses to declare the gate passed on any
+  failure. Run before `/review`. Does not mean "feature done" — only
+  "local checks pass."
 
 ## Hooks
 
 `.claude/settings.json` runs `ruff check` and `mypy` after every
 `Edit`/`Write` via a PostToolUse hook. Fix lint/type errors immediately
 rather than declaring victory with a broken build.
+
+The hook formats and lints on every edit. The full local gate (lint +
+format + types + tests) is gated behind the explicit `/review-check`
+slash command, not the auto-hook — tests are too slow to run on every
+edit but they're non-optional before invoking `/review`.
 
 ## Don't-touch list
 

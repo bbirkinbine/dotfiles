@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -d src ] && [ -d tests ]; then uv run ruff check src/ tests/ && uv run mypy src/; fi"
+            "command": "if [ -d src ] && [ -d tests ]; then uv run ruff format . && uv run ruff check . && uv run mypy src/; fi"
           }
         ]
       }

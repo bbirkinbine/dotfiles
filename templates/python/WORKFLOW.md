@@ -149,3 +149,8 @@ skip `/review` if you're the only reviewer. Scale the loop to the work.
 - Methodology background:
   `Research/Programming/Agentic Programming/02 Agentic Methodology Loop.md`
   in the Obsidian vault
+- Where the backlog *outside* the feature loop lives — GitHub Issues
+  conventions, label vocabulary, and the issue ↔ spec ↔ branch ↔ PR
+  chain for solo + Claude Code projects:
+  `Research/Programming/Agentic Programming/06 GitHub Issues for Solo Agentic Projects.md`
+  in the Obsidian vault

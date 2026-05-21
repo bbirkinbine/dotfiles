@@ -2,6 +2,12 @@
 
 Personal shell and development-environment configuration for macOS.
 
+> ## Status
+>
+> Published as a personal repo, not a managed product. Issues and PRs are welcome but won't get fast turnaround.
+>
+> **This repo is in-flight.**
+
 Contents:
 - `.zshrc` — interactive shell config (aliases, PATH, completions, direnv, vi mode)
 - `.zprofile` — login shell config (Homebrew shellenv, OrbStack, JetBrains Toolbox)

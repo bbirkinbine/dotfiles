@@ -178,8 +178,8 @@ Don't claim a change is "ready" without at least:
 
 ---
 
-## Open work / current state (updated 2026-05-14)
+## Open work / current state (updated 2026-05-21)
 
-Stable. Updates are infrequent — usually a new tool added to `PATH` or
-an alias change. The `templates/` directory is the more active surface
-as the project-bootstrap pattern evolves.
+In-flight, not stable. The shell/git dotfiles see occasional tweaks
+(new tool on `PATH`, alias change); `templates/` is the more active
+surface as the project-bootstrap pattern evolves.

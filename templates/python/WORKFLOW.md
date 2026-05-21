@@ -1,4 +1,4 @@
-# Workflow — how to actually use this scaffolding
+# Workflow — how to use this scaffolding
 
 > Companion to `CLAUDE.md`. `CLAUDE.md` is the standing instructions the
 > agent reads every turn — the rules. This file is the human-facing
@@ -50,7 +50,11 @@ Each step is a separate turn. The slash commands enforce that — every
 subagent stops and surfaces output rather than continuing into the next
 phase on its own. You decide whether to advance.
 
-```
+```text
+/scope-check add user authentication   # OPTIONAL — only when goal/scope is ambiguous.
+                                       # Five forcing questions. Output goes into the
+                                       # spec's ## Goal and ## Non-goals.
+        ↓
 /spec add user authentication      # scaffolds docs/specs/NNNN-add-user-authentication.md
         ↓
 [edit the spec]                    # goal, success criteria, non-goals;
@@ -62,6 +66,8 @@ phase on its own. You decide whether to advance.
                                    # reviewable in < 5 minutes.
                                    # if the plan is wrong, fix the spec
                                    # or push back — don't proceed
+        ↓
+       (/clear if multi-day — see "Phase handoff" below)
         ↓
 /test-first                        # writes failing pytest tests from the spec
         ↓
@@ -77,12 +83,20 @@ phase on its own. You decide whether to advance.
 /review-check                      # local gate: ruff lint + format + mypy + pytest;
                                    # refuses to pass on any failure
         ↓
+       (/clear if multi-day — see "Phase handoff" below)
+        ↓
 /review                            # independent reviewer against spec + diff
+/review-adversarial                # same diff, adversarial framing — argues against
+                                   # the change. Run on meaningful features and read
+                                   # both review outputs side-by-side.
    /security                       # if installed AND the diff trips a security trigger
    /performance                    # if installed AND the diff trips a performance trigger
         ↓
 [commit, explicitly]               # CLAUDE.md forbids agent-initiated commits;
                                    # you write the commit message
+        ↓
+[append ## Implementation Notes    # OPTIONAL — capture decisions that surfaced
+ to the spec, post-merge]          # during build but weren't in the original spec.
 ```
 
 ## Where this goes wrong if you skip steps
@@ -106,6 +120,38 @@ phase on its own. You decide whether to advance.
   isn't in `.claude/agents/`. The check doesn't run. If you decided at
   day zero that the project warrants the opt-in, install it then —
   don't defer.
+
+## Phase handoff (multi-day features)
+
+Single-session features run the loop end-to-end — the common case the
+diagram covers.
+
+For a feature that spans multiple sessions — a real architectural
+change, a multi-package refactor, anything where the main session would
+end the day past 50% context — running the whole loop in one session
+degrades review quality. By the time `/review` fires, the main session
+has accumulated spec discussion, plan iteration, test-writing, and
+implementation context. That's the U-curve from
+`Research/Programming/Agentic Programming/01 Context Management for Coding Agents.md`
+in the Obsidian vault.
+
+The discipline: at each phase boundary, append a `## Phase handoff`
+section to the spec capturing the current state and entry conditions
+for the next phase. Then run `/clear` and resume in a fresh session.
+The fresh session re-reads `CLAUDE.md`, the spec (with the handoff
+section), and the diff — it has all it needs to pick up where the
+previous session left off.
+
+Where the boundaries are worth a `/clear`:
+
+- After `/plan` is reviewed and accepted, before `/test-first`.
+- After implementation passes `/review-check`, before `/review`.
+
+Skip the handoff on single-session features — it's overhead the loop
+doesn't need until the session itself is the bottleneck.
+
+See `docs/specs/README.md` for the `## Phase handoff` and
+`## Implementation Notes` section shapes.
 
 ## When NOT to use the full loop
 

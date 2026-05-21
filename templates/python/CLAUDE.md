@@ -7,6 +7,11 @@ or will become public after the first feature lands. Treat every change
 as world-readable from commit #1. See the "Secrets and public-repo
 hygiene" section below.
 
+An `AGENTS.md` stub sits alongside this file as a portable pointer for
+non-Claude agents (Codex, Cursor, Gemini, etc.) that look for that
+filename by convention. `CLAUDE.md` is the source of truth; `AGENTS.md`
+points back here.
+
 ## Stack
 
 - Python 3.12 (managed by `uv`)
@@ -62,8 +67,16 @@ open-ended.
   `/review-check` to confirm the local quality gate passes (ruff lint,
   ruff format, mypy, pytest). Then use the `reviewer` subagent on the
   diff. It has not seen the implementation reasoning and reads only the
-  diff + spec. Add `/security` and/or `/performance` if the relevant
-  opt-in subagent is installed and the diff trips its triggers.
+  diff + spec. For meaningful features, also run `/review-adversarial`
+  on the same diff and read both side-by-side. Add `/security` and/or
+  `/performance` if the relevant opt-in subagent is installed and the
+  diff trips its triggers.
+- **Phase handoff on multi-day features.** If the loop spans more than
+  one session, append a `## Phase handoff` section to the spec at each
+  phase boundary (state + entry conditions for the next phase), then
+  run `/clear` and resume in a fresh session. Main-session context past
+  the U-curve degrades review quality; the handoff section is how the
+  fresh session picks up without re-deriving context from the chat.
 - If a change would touch > 5 files, stop and ask first.
 
 ## Subagents (in `.claude/agents/`)
@@ -73,6 +86,10 @@ open-ended.
   implementation.
 - `reviewer` — independent diff reviewer; checks spec match, test
   quality, edge cases, file size, public-repo hygiene.
+- `reviewer-adversarial` — independent diff reviewer with adversarial
+  framing; argues against the change rather than for it. Use alongside
+  `reviewer` on meaningful features for A/B comparison. Same section
+  structure as `reviewer` so both can be read side-by-side.
 
 Opt-in subagents (copy from
 `~/Downloads/src/dotfiles/templates/python/.claude/agents/optional/`
@@ -105,13 +122,24 @@ One-keystroke entry points to the workflow loop. The commands invoke
 the subagents and quality gate so the methodology is muscle memory
 instead of manual invocation.
 
+- `/scope-check <feature description>` — optional pre-spec phase. Five
+  forcing questions to clarify goal and scope on ambiguous features.
+  Output feeds the spec's `## Goal` and `## Non-goals` sections. Skip
+  on features where the goal is already concrete.
 - `/spec <feature name>` — creates `docs/specs/NNNN-<slug>.md` with
-  goal / success / non-goals scaffolding; stops there for human edit.
+  status header + goal / success / non-goals scaffolding; stops there
+  for human edit.
+- `/specs-status [filter]` — prints the status table for every spec
+  under `docs/specs/` (draft / shipping / shipped / paused / abandoned).
+  Read-only aggregator over the `**Status:**` field in each spec.
 - `/plan [spec-path]` — invokes the `planner` subagent on the named
   spec, or the most recent one if blank.
 - `/test-first [spec-path]` — invokes the `test-first` subagent.
 - `/review [<base>..<head>]` — invokes the `reviewer` subagent on the
   current diff (or the named range).
+- `/review-adversarial [<base>..<head>]` — invokes the
+  `reviewer-adversarial` subagent on the same diff. Pair with `/review`
+  on meaningful features for A/B comparison; same output schema.
 - `/security [<base>..<head>]` — invokes `security-reviewer` if
   installed; otherwise tells you how to enable it.
 - `/performance [<base>..<head>]` — invokes `performance-reviewer` if
@@ -123,14 +151,14 @@ instead of manual invocation.
 
 ## Hooks
 
-`.claude/settings.json` runs `ruff check` and `mypy` after every
-`Edit`/`Write` via a PostToolUse hook. Fix lint/type errors immediately
-rather than declaring victory with a broken build.
+`.claude/settings.json` runs `ruff format`, `ruff check`, and `mypy`
+after every `Edit`/`Write` via a PostToolUse hook. Fix lint/type errors
+immediately rather than declaring victory with a broken build.
 
-The hook formats and lints on every edit. The full local gate (lint +
-format + types + tests) is gated behind the explicit `/review-check`
-slash command, not the auto-hook — tests are too slow to run on every
-edit but they're non-optional before invoking `/review`.
+The full local gate (lint + format + types + tests) is gated behind the
+explicit `/review-check` slash command, not the auto-hook — tests are
+too slow to run on every edit but they're non-optional before invoking
+`/review`.
 
 ## Don't-touch list
 

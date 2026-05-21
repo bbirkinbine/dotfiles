@@ -11,6 +11,21 @@ Contents:
   GitHub About checklist, new-project checklist) for new repositories.
   See [`templates/README.md`](templates/README.md).
 
+## Quick start — new project from this repo
+
+**Python project with the agentic workflow:**
+
+```bash
+cd ~/Downloads/src/new-project
+bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
+```
+
+Then read [`templates/python/WORKFLOW.md`](templates/python/WORKFLOW.md) — day-zero checklist + per-feature loop walkthrough.
+
+**Non-Python repo:** copy [`templates/CLAUDE.md.template`](templates/CLAUDE.md.template) and [`templates/README.md.template`](templates/README.md.template), fill the `{{placeholders}}`, then walk [`templates/new-project-checklist.md`](templates/new-project-checklist.md).
+
+Either way: [`templates/README.md`](templates/README.md) is the flavor switchboard with more context.
+
 ## AI-assisted
 
 Portions of this repository were authored or edited with the assistance of AI tools.

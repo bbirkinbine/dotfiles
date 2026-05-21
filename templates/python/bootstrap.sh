@@ -7,10 +7,15 @@
 #   bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
 #
 # What it does:
-#   - Copies CLAUDE.md, WORKFLOW.md, pyproject.toml, .pre-commit-config.yaml
-#     into the current directory (verbatim, with {{PLACEHOLDER}} slots).
-#   - Copies the .claude/ tree: settings.json + the three default subagents
-#     (planner / test-first / reviewer) + the python-module-split skill.
+#   - Copies CLAUDE.md, WORKFLOW.md, AGENTS.md, pyproject.toml,
+#     .pre-commit-config.yaml into the current directory (verbatim, with
+#     {{PLACEHOLDER}} slots where applicable).
+#   - Copies the .claude/ tree: settings.json + the default subagents
+#     (planner / test-first / reviewer / reviewer-adversarial) + the
+#     default skills (python-module-split / python-docstrings /
+#     dependency-hygiene) + the default slash commands (spec,
+#     specs-status, scope-check, plan, test-first, review-check, review,
+#     review-adversarial, security, performance).
 #   - Copies docs/specs/README.md so the specs convention is documented.
 #   - Does NOT copy bootstrap.sh, README.md (this directory's index),
 #     subdir-CLAUDE.md.example (copied manually into each src/<area>/),
@@ -61,17 +66,22 @@ copy() {
 
 copy CLAUDE.md
 copy WORKFLOW.md
+copy AGENTS.md
 copy pyproject.toml
 copy .pre-commit-config.yaml
 copy .claude/settings.json
 copy .claude/agents/planner.md
 copy .claude/agents/test-first.md
 copy .claude/agents/reviewer.md
+copy .claude/agents/reviewer-adversarial.md
 copy .claude/commands/spec.md
+copy .claude/commands/specs-status.md
+copy .claude/commands/scope-check.md
 copy .claude/commands/plan.md
 copy .claude/commands/test-first.md
 copy .claude/commands/review-check.md
 copy .claude/commands/review.md
+copy .claude/commands/review-adversarial.md
 copy .claude/commands/security.md
 copy .claude/commands/performance.md
 copy .claude/skills/python-module-split/SKILL.md
@@ -109,10 +119,15 @@ echo "     cp $SRC_DIR/.claude/agents/optional/performance-reviewer.md \\"
 echo "        .claude/agents/performance-reviewer.md"
 echo
 echo "Workflow loop (slash commands installed in .claude/commands/):"
-echo "  /spec <name>    create a spec under docs/specs/"
-echo "  /plan           invoke the planner subagent on the latest spec"
-echo "  /test-first     invoke the test-first subagent"
-echo "  /review-check   run the local quality gate (ruff, format, mypy, pytest)"
-echo "  /review         invoke the reviewer subagent on the current diff"
-echo "  /security       invoke security-reviewer (if installed)"
-echo "  /performance    invoke performance-reviewer (if installed)"
+echo "  /scope-check <desc>    OPTIONAL — five forcing questions before /spec"
+echo "                         when goal/scope is ambiguous"
+echo "  /spec <name>           create a spec under docs/specs/"
+echo "  /specs-status [filter] print the status table for all specs"
+echo "  /plan                  invoke the planner subagent on the latest spec"
+echo "  /test-first            invoke the test-first subagent"
+echo "  /review-check          run the local quality gate (ruff, format, mypy, pytest)"
+echo "  /review                invoke the reviewer subagent on the current diff"
+echo "  /review-adversarial    invoke reviewer-adversarial on the same diff;"
+echo "                         pair with /review on meaningful features"
+echo "  /security              invoke security-reviewer (if installed)"
+echo "  /performance           invoke performance-reviewer (if installed)"

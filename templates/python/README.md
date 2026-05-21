@@ -15,29 +15,34 @@ both. The conventions and rationale behind each piece live at:
 
 ## What's in here
 
-```
+```text
 python/
 ├── README.md                              # this file (not copied to projects)
 ├── bootstrap.sh                           # the one-shot setup script
 ├── CLAUDE.md                              # project-root context for Claude Code
+├── AGENTS.md                              # portable stub for non-Claude agents; points at CLAUDE.md
 ├── WORKFLOW.md                            # human-facing loop walkthrough (start here)
 ├── pyproject.toml                         # uv + ruff + mypy + pytest config
 ├── .pre-commit-config.yaml                # ruff + mypy on every commit
 ├── .claude/
-│   ├── settings.json                      # PostToolUse hook: ruff + mypy
+│   ├── settings.json                      # PostToolUse hook: ruff format + ruff check + mypy
 │   ├── agents/
 │   │   ├── planner.md                     # Spec → markdown plan; read-only
 │   │   ├── test-first.md                  # Write failing pytest tests; never implements
-│   │   ├── reviewer.md                    # Independent diff reviewer (general)
+│   │   ├── reviewer.md                    # Independent diff reviewer (collaborative framing)
+│   │   ├── reviewer-adversarial.md        # Independent diff reviewer (adversarial framing)
 │   │   └── optional/
 │   │       ├── security-reviewer.md       # App-sec review (opt-in, not auto-copied)
 │   │       └── performance-reviewer.md    # Perf review (opt-in, not auto-copied)
 │   ├── commands/
 │   │   ├── spec.md                        # /spec <name> — create docs/specs/NNNN-<slug>.md
+│   │   ├── specs-status.md                # /specs-status — print status table over all specs
+│   │   ├── scope-check.md                 # /scope-check — five forcing questions before /spec
 │   │   ├── plan.md                        # /plan — invoke planner subagent
 │   │   ├── test-first.md                  # /test-first — invoke test-first subagent
 │   │   ├── review-check.md                # /review-check — local gate before /review
 │   │   ├── review.md                      # /review — invoke reviewer subagent
+│   │   ├── review-adversarial.md          # /review-adversarial — invoke reviewer-adversarial
 │   │   ├── security.md                    # /security — invoke security-reviewer (if installed)
 │   │   └── performance.md                 # /performance — invoke performance-reviewer (if installed)
 │   └── skills/
@@ -48,7 +53,7 @@ python/
 │       └── dependency-hygiene/
 │           └── SKILL.md                   # Auto-invoked when pyproject.toml adds a dep
 ├── docs/specs/
-│   └── README.md                          # Spec numbering + minimum shape
+│   └── README.md                          # Spec numbering, status vocabulary, optional sections
 └── subdir-CLAUDE.md.example               # Per-area CLAUDE.md template
                                             # (copied manually, not by bootstrap)
 ```
@@ -98,16 +103,24 @@ After bootstrap:
 `Spec → Plan → Test-first → Implement → Verify`, where:
 
 | Phase | Driven by | Slash command |
-|---|---|---|
-| Spec | You write `docs/specs/NNNN-<feature>.md` | `/spec <name>` (scaffolds the file) |
+| --- | --- | --- |
+| Scope check (optional pre-spec) | You answer five forcing questions; output feeds the spec | `/scope-check <desc>` |
+| Spec | You write `docs/specs/NNNN-<feature>.md` (seeded with status header) | `/spec <name>` |
 | Plan | `planner` subagent (`.claude/agents/planner.md`) | `/plan [spec-path]` |
 | Test-first | `test-first` subagent (`.claude/agents/test-first.md`) | `/test-first [spec-path]` |
 | Implement | Main Claude session (CLAUDE.md tells it the rules) | — |
 | Per-edit quality | PostToolUse hook (`.claude/settings.json`) runs ruff format + ruff check + mypy on every Edit/Write | — |
 | Local quality gate (pre-review) | ruff lint + format + mypy + pytest, refuses pass on failure | `/review-check` |
-| Verify | `reviewer` subagent (`.claude/agents/reviewer.md`) | `/review [<base>..<head>]` |
+| Verify (collaborative) | `reviewer` subagent (`.claude/agents/reviewer.md`) | `/review [<base>..<head>]` |
+| Verify (adversarial — pair with `/review` on meaningful PRs) | `reviewer-adversarial` subagent (`.claude/agents/reviewer-adversarial.md`) | `/review-adversarial [<base>..<head>]` |
 | Verify (security) | `security-reviewer` (opt-in subagent) | `/security [<base>..<head>]` |
 | Verify (performance) | `performance-reviewer` (opt-in subagent) | `/performance [<base>..<head>]` |
+| Status overview (any time) | Aggregates `**Status:**` over all specs under `docs/specs/` | `/specs-status [filter]` |
+
+On multi-day features, append a `## Phase handoff` section to the spec
+at phase boundaries and run `/clear` between phases — see
+[`WORKFLOW.md`](WORKFLOW.md) "Phase handoff" and
+[`docs/specs/README.md`](docs/specs/README.md) "Optional sections."
 
 Auto-invoked side-skills (load on demand based on what's happening in
 the diff):
@@ -124,6 +137,11 @@ Claude to route to each subagent based on task size (> 3 files: planner;
 tests first: test-first; before commit: reviewer; > 5 files: stop and
 ask). The slash commands above are the one-keystroke way to invoke each
 phase explicitly when the agent doesn't auto-route.
+
+`AGENTS.md` is a portable stub sibling of `CLAUDE.md` — non-Claude
+agents (Codex, Cursor, Gemini) that look for that filename by
+convention find a pointer back to `CLAUDE.md`. `CLAUDE.md` stays the
+source of truth.
 
 ## Opt-in subagents
 

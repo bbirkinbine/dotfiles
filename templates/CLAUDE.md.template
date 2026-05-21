@@ -3,7 +3,10 @@
 > **Purpose.** Persistent project context for Claude Code (and other AI
 > coding agents) working in this repository. Read this before suggesting
 > changes. `README.md` is for humans landing on the GitHub page; this file
-> is for the agent that opens the repo and starts working.
+> is for the agent that opens the repo and starts working. An optional
+> `AGENTS.md` stub (see `templates/AGENTS.md.template` in the dotfiles
+> repo) sits alongside this file as a portable pointer for non-Claude
+> agents that look for that filename by convention.
 
 ---
 

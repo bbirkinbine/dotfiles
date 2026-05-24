@@ -56,6 +56,68 @@ A spec doesn't need to be long. The minimum is:
 
 - <Things we're explicitly NOT doing in this spec. Prevents scope creep at plan time.>
 
+## External references
+
+<Where any value or claim in this spec gets its correctness from when
+that correctness depends on matching an outside authority. Examples
+worth screening (not exhaustive): constant tables and lookups,
+algorithm constants (CRC polynomials, hash IVs, S-boxes, curve
+parameters), API contracts (endpoint paths, field names, status
+codes), file-format markers and struct offsets, grammars and regexes
+purporting to implement a documented format, library signatures,
+test vectors / known-answer tests, and cited section numbers
+("per RFC 7231 §6.4"). The rule is about claimed provenance, not the
+data shape — if the spec or implementation will *cite* an outside
+source for correctness, it gets declared here.
+
+Required — "None" is a valid answer, but the question must be
+answered. Pick the case that applies:
+
+- **Authoritative source.** Name the source and pin a URL + retrieval
+  date + the source's license (e.g., "GS1 Manufacturer ID registry,
+  https://… , retrieved YYYY-MM-DD, license: public registry / CC-BY
+  / MIT / GPL-3.0 / unclear"). Implementation MUST `WebFetch` this URL
+  in-session rather than reconstructing values from training data.
+  Tests MUST include at least one fixture from an *independent*
+  source — a second URL, a permissively-licensed reference
+  implementation in `vendor/`, or a hand-decoded byte trace. Fixtures
+  derived from the same assumptions the implementation makes
+  round-trip noise, not correctness.
+
+  **License compatibility is part of the source decision, not a
+  follow-up.** This repo defaults to a permissive license (MIT-style).
+  When the candidate source is:
+
+  - Permissive (MIT, BSD, Apache-2.0, CC0, public domain, or an
+    official registry page with no per-page license) → copy values
+    with attribution.
+  - Copyleft (GPL, AGPL, LGPL with strings) → **consult-only**.
+    Read it in a browser to verify your independently-derived values;
+    do **not** copy the table verbatim and do **not** check the
+    project into `vendor/` — vendoring infects the repo even without
+    copying. If it's the only source, treat that as a spec-level
+    decision: pick a different source, accept the license change, or
+    downgrade provenance to "Empirical" / "None — original" with the
+    correspondingly smaller claim.
+  - Unclear or absent license → treat as all-rights-reserved. "No
+    LICENSE file" is not "permissive by default."
+- **Empirical.** No published authority, but observable reference
+  behavior exists. Capture fixtures from real systems and note their
+  provenance ("decoded from N device dumps captured YYYY-MM-DD from
+  <system>"). The implementation is documented as empirical, not
+  specified.
+- **None — original.** No external authority, no reference behavior.
+  The spec *is* the source. State this explicitly so the reviewer
+  knows not to expect cited values to match an outside registry, and
+  so downstream consumers know this is a proposal rather than
+  documentation of an existing standard.
+
+Fabricating a source — citing a registry, RFC, or vendor table the
+spec and implementation never actually fetched — is the failure this
+section exists to prevent. If no source has been found, say so; do
+not invent one. The agent should push back at spec time rather than
+invent provenance at implementation time.>
+
 ## Sketch
 
 <Optional: a few sentences on the approach. The planner subagent

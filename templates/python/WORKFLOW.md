@@ -120,6 +120,17 @@ phase on its own. You decide whether to advance.
   isn't in `.claude/agents/`. The check doesn't run. If you decided at
   day zero that the project warrants the opt-in, install it then —
   don't defer.
+- **Fabricating external reference data.** When the spec depends on a
+  registry, RFC, vendor table, or any other external authority, the
+  values must be either fetched in-session (URL + date pinned above the
+  table in code) or declared as empirical / original in the spec's
+  `## External references` section. The failure mode is the one the
+  spec template warns against: the agent writes the table from
+  training, names a source it never fetched, then writes fixtures that
+  match its own assumptions. Every test passes and every value is
+  wrong, because the round-trip never touched reality. If no source has
+  been found, the spec must say so — push back at spec time rather than
+  invent provenance later.
 
 ## Phase handoff (multi-day features)
 

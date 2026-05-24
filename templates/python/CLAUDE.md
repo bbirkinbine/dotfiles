@@ -53,8 +53,10 @@ open-ended.
 
 - **Spec.** Before any non-trivial work, write a short spec under
   `docs/specs/NNNN-<feature>.md` (see `docs/specs/README.md` for the
-  numbering convention). One paragraph minimum: goal, success criteria,
-  non-goals.
+  numbering convention and required sections, including
+  `## External references` for the provenance of any registries,
+  protocol tables, or vendor constants the feature depends on). One
+  paragraph minimum: goal, success criteria, non-goals.
 - **Plan.** For tasks that touch > 3 files: use the `planner` subagent
   first. It reads the spec + relevant code and produces a markdown
   plan. Review the plan before any writes happen.
@@ -62,7 +64,18 @@ open-ended.
   subagent to write failing pytest tests from the spec. Show me the
   failing-test output. Only then proceed to implementation.
 - **Implement.** Main session writes the minimum code to make the
-  tests pass.
+  tests pass. Any value or claim whose correctness depends on matching
+  an external authority — listed in the spec's `## External references`
+  section — must be populated by `WebFetch` in-session with the source
+  URL + retrieval date + license pinned in a header comment near where
+  the value is defined. Reconstructing such values from training is the
+  fabrication failure the spec template warns against — if the source
+  isn't fetchable, the spec's provenance is wrong; fix the spec, not
+  the code. Copyleft-licensed sources (GPL/AGPL/LGPL) are consult-only
+  in a permissive repo: do not copy their content verbatim and do not
+  check the project into `vendor/`. See `docs/specs/README.md`
+  `## External references` for the categories this covers and the
+  license compatibility rules.
 - **Verify.** Before invoking the `reviewer` subagent, run
   `/review-check` to confirm the local quality gate passes (ruff lint,
   ruff format, mypy, pytest). Then use the `reviewer` subagent on the

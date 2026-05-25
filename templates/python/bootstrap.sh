@@ -1,93 +1,155 @@
 #!/usr/bin/env bash
-# Bootstrap a Python project with the agentic-workflow scaffolding from
-# Brian's dotfiles. Run from the new project's root.
+# Bootstrap (or update) a Python project with the agentic-workflow
+# scaffolding from Brian's dotfiles. Run from the project's root.
 #
 # Usage:
 #   cd ~/Downloads/src/new-project
-#   bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
+#   bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh            # first-time setup
+#   bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh --update   # pull template improvements
 #
-# What it does:
-#   - Copies CLAUDE.md, WORKFLOW.md, AGENTS.md, pyproject.toml,
-#     .pre-commit-config.yaml into the current directory (verbatim, with
-#     {{PLACEHOLDER}} slots where applicable).
-#   - Copies the .claude/ tree: settings.json + the default subagents
-#     (planner / test-first / reviewer / reviewer-adversarial) + the
-#     default skills (python-module-split / python-docstrings /
-#     dependency-hygiene) + the default slash commands (spec,
-#     specs-status, scope-check, plan, test-first, review-check, review,
-#     review-adversarial, security, performance).
-#   - Copies docs/specs/README.md so the specs convention is documented.
-#   - Does NOT copy bootstrap.sh, README.md (this directory's index),
-#     subdir-CLAUDE.md.example (copied manually into each src/<area>/),
-#     or anything under .claude/agents/optional/ (opt-in subagents that
-#     each project enables per-need — see Done message at the end).
-#   - Will NOT overwrite existing files; prints a warning and skips each one.
+# Two classes of file:
+#   - PROJECT-OWNED  (CLAUDE.md, pyproject.toml, .gitignore) — written
+#     once, then customized per project (filled placeholders, real deps,
+#     project-specific ignores). NEVER overwritten, in either mode.
+#   - MANAGED  (everything else — the .claude/ tree, WORKFLOW.md,
+#     AGENTS.md, .pre-commit-config.yaml, docs/specs/README.md, the
+#     .github/ tree) — the agentic scaffolding itself. On first run it
+#     is copied if absent; with --update it is overwritten so existing
+#     projects pick up template improvements.
 #
-# After running:
+# What it copies:
+#   - CLAUDE.md, WORKFLOW.md, AGENTS.md, pyproject.toml, .gitignore,
+#     .pre-commit-config.yaml
+#   - the .claude/ tree: settings.json + the branch-check SessionStart
+#     hook + the default subagents (planner / test-first / reviewer /
+#     reviewer-adversarial) + the default skills (python-module-split /
+#     python-docstrings / dependency-hygiene) + the default slash
+#     commands (spec, specs-status, scope-check, plan, test-first,
+#     review-check, review, review-adversarial, security, performance)
+#   - docs/specs/README.md — the specs convention
+#   - the .github/ tree: CI workflow, PR template, issue forms
+#
+# What it does NOT copy:
+#   - bootstrap.sh, README.md (this directory's index),
+#     subdir-CLAUDE.md.example (copied manually into each src/<area>/)
+#   - anything under .claude/agents/optional/ (opt-in subagents that
+#     each project enables per-need — see the Done message at the end)
+#
+# After a first run:
 #   1. Walk the {{PLACEHOLDER}} slots in CLAUDE.md, pyproject.toml.
 #      Verify with: rg '\{\{' .
-#   2. Walk the rest of ~/Downloads/src/dotfiles/templates/new-project-checklist.md
-#      for the README.md acknowledgement, GitHub About sidebar, and identity check.
+#   2. Walk ~/Downloads/src/dotfiles/templates/new-project-checklist.md
+#      for the README.md acknowledgement, GitHub About sidebar, identity check.
 #   3. uv sync && uv run pre-commit install
 
 set -euo pipefail
+
+MODE=install
+for arg in "$@"; do
+  case "$arg" in
+    --update) MODE=update ;;
+    -h | --help)
+      echo "Usage: bootstrap.sh [--update]"
+      echo "  (no args)  first-time setup — copies missing files, never overwrites"
+      echo "  --update   refresh MANAGED files to the current template;"
+      echo "             project-owned files (CLAUDE.md, pyproject.toml,"
+      echo "             .gitignore) are left untouched"
+      exit 0
+      ;;
+    *)
+      echo "ERROR: unknown argument: $arg  (run with --help for usage)"
+      exit 1
+      ;;
+  esac
+done
 
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DST_DIR="$(pwd)"
 
 if [[ "$SRC_DIR" == "$DST_DIR" ]]; then
   echo "ERROR: refusing to bootstrap into the dotfiles template directory itself."
-  echo "       cd into the new project's root before running this script."
+  echo "       cd into the project's root before running this script."
   exit 1
 fi
 
-echo "Bootstrapping Python agentic-workflow scaffolding"
+if [[ "$MODE" == update ]]; then
+  echo "Updating MANAGED agentic-workflow scaffolding"
+else
+  echo "Bootstrapping Python agentic-workflow scaffolding"
+fi
 echo "  from: $SRC_DIR"
 echo "  into: $DST_DIR"
 echo
 
-# Files and directories to copy. Bootstrap.sh and the README/example are excluded.
+# copy: PROJECT-OWNED files. Written once, never overwritten — they are
+# customized per project (filled placeholders, real deps, ignores).
 copy() {
   local rel="$1"
   local src="$SRC_DIR/$rel"
   local dst="$DST_DIR/$rel"
   if [[ -e "$dst" ]]; then
+    echo "  skip (project-owned, exists): $rel"
+    return
+  fi
+  mkdir -p "$(dirname "$dst")"
+  cp -R "$src" "$dst"
+  echo "  copied: $rel"
+}
+
+# sync: MANAGED files. Copied if absent; with --update, overwritten so
+# the project tracks template improvements.
+sync() {
+  local rel="$1"
+  local src="$SRC_DIR/$rel"
+  local dst="$DST_DIR/$rel"
+  local existed=0
+  [[ -e "$dst" ]] && existed=1
+  if [[ "$existed" == 1 && "$MODE" == install ]]; then
     echo "  skip (exists): $rel"
     return
   fi
   mkdir -p "$(dirname "$dst")"
-  if [[ -d "$src" ]]; then
-    cp -R "$src" "$dst"
+  cp -R "$src" "$dst"
+  if [[ "$existed" == 1 ]]; then
+    echo "  updated: $rel"
   else
-    cp "$src" "$dst"
+    echo "  copied: $rel"
   fi
-  echo "  copied: $rel"
 }
 
+# --- project-owned: copied once, never overwritten ---
 copy CLAUDE.md
-copy WORKFLOW.md
-copy AGENTS.md
 copy pyproject.toml
-copy .pre-commit-config.yaml
-copy .claude/settings.json
-copy .claude/agents/planner.md
-copy .claude/agents/test-first.md
-copy .claude/agents/reviewer.md
-copy .claude/agents/reviewer-adversarial.md
-copy .claude/commands/spec.md
-copy .claude/commands/specs-status.md
-copy .claude/commands/scope-check.md
-copy .claude/commands/plan.md
-copy .claude/commands/test-first.md
-copy .claude/commands/review-check.md
-copy .claude/commands/review.md
-copy .claude/commands/review-adversarial.md
-copy .claude/commands/security.md
-copy .claude/commands/performance.md
-copy .claude/skills/python-module-split/SKILL.md
-copy .claude/skills/python-docstrings/SKILL.md
-copy .claude/skills/dependency-hygiene/SKILL.md
-copy docs/specs/README.md
+copy .gitignore
+
+# --- managed: refreshed by --update ---
+sync WORKFLOW.md
+sync AGENTS.md
+sync .pre-commit-config.yaml
+sync .claude/settings.json
+sync .claude/hooks/branch-check.sh
+sync .claude/agents/planner.md
+sync .claude/agents/test-first.md
+sync .claude/agents/reviewer.md
+sync .claude/agents/reviewer-adversarial.md
+sync .claude/commands/spec.md
+sync .claude/commands/specs-status.md
+sync .claude/commands/scope-check.md
+sync .claude/commands/plan.md
+sync .claude/commands/test-first.md
+sync .claude/commands/review-check.md
+sync .claude/commands/review.md
+sync .claude/commands/review-adversarial.md
+sync .claude/commands/security.md
+sync .claude/commands/performance.md
+sync .claude/skills/python-module-split/SKILL.md
+sync .claude/skills/python-docstrings/SKILL.md
+sync .claude/skills/dependency-hygiene/SKILL.md
+sync docs/specs/README.md
+sync .github/workflows/ci.yml
+sync .github/pull_request_template.md
+sync .github/ISSUE_TEMPLATE/feature.yml
+sync .github/ISSUE_TEMPLATE/bug.yml
 
 # Intentionally NOT copied (opt-in per project):
 #   .claude/agents/optional/security-reviewer.md     — for projects with a network
@@ -98,6 +160,16 @@ copy docs/specs/README.md
 #   See $SRC_DIR/.claude/agents/optional/ for what's available.
 
 echo
+
+if [[ "$MODE" == update ]]; then
+  echo "Update complete. Review what changed:"
+  echo "  git diff"
+  echo
+  echo "Project-owned files (CLAUDE.md, pyproject.toml, .gitignore) were left"
+  echo "untouched. If the template's versions of those changed, merge by hand."
+  exit 0
+fi
+
 echo "Done. Next steps:"
 echo "  0. Read WORKFLOW.md — the loop walkthrough with worked examples."
 echo "  1. Replace placeholders:  rg '\\{\\{' . | head"
@@ -105,14 +177,19 @@ echo "  2. Walk the rest of the new-project checklist:"
 echo "     ~/Downloads/src/dotfiles/templates/new-project-checklist.md"
 echo "  3. Install dev environment:"
 echo "     uv sync && uv run pre-commit install"
-echo "  4. Write your first spec:  /spec <feature name>  (or by hand at docs/specs/0001-<feature>.md)"
-echo "  5. For per-subdir CLAUDE.md files:"
+echo "  4. Create the GitHub issue labels the issue forms reference"
+echo "     (feature, bug, spec-needed, triage, ...) — see the label"
+echo "     vocabulary in the vault note '06 GitHub Issues for Solo"
+echo "     Agentic Projects'."
+echo "  5. Write your first spec:  /spec <feature name>  (or by hand at"
+echo "     docs/specs/0001-<feature>.md)"
+echo "  6. For per-subdir CLAUDE.md files:"
 echo "     cp $SRC_DIR/subdir-CLAUDE.md.example src/<area>/CLAUDE.md"
-echo "  6. If this project has a network surface, auth, or processes"
+echo "  7. If this project has a network surface, auth, or processes"
 echo "     untrusted input, add the opt-in security-reviewer:"
 echo "     cp $SRC_DIR/.claude/agents/optional/security-reviewer.md \\"
 echo "        .claude/agents/security-reviewer.md"
-echo "  7. If this project has a hot path, async code, DB queries on"
+echo "  8. If this project has a hot path, async code, DB queries on"
 echo "     user-sized data, or a latency SLO, add the opt-in"
 echo "     performance-reviewer:"
 echo "     cp $SRC_DIR/.claude/agents/optional/performance-reviewer.md \\"
@@ -131,3 +208,6 @@ echo "  /review-adversarial    invoke reviewer-adversarial on the same diff;"
 echo "                         pair with /review on meaningful features"
 echo "  /security              invoke security-reviewer (if installed)"
 echo "  /performance           invoke performance-reviewer (if installed)"
+echo
+echo "To pull future template improvements into this project, re-run with:"
+echo "  bash $SRC_DIR/bootstrap.sh --update"

@@ -4,10 +4,13 @@ Drop-in scaffolding for new Python projects under `~/Downloads/src/`.
 Mirrors the destination structure exactly — `bootstrap.sh` just `cp -r`s
 the files into place.
 
-This directory is the dotfiles mirror of the Obsidian source of truth
-at `Research/Programming/Agentic Programming/starter-files/` in my
-vault. Both should stay in sync; if a starter file evolves, update
-both. The conventions and rationale behind each piece live at:
+This directory **is the source of truth** for the agentic-workflow
+scaffolding, version-controlled in the private dotfiles repo
+(`github.com/bbirkinbine/dotfiles`). It used to be mirrored into the
+Obsidian vault under
+`Research/Programming/Agentic Programming/starter-files/`; that mirror
+is retired — the vault folder is now just a pointer back here. The
+vault still holds the conventions and rationale behind each piece:
 
 - `Research/Programming/Agentic Programming/00 Agentic Programming.md`
 - `Research/Programming/Agentic Programming/02 Agentic Methodology Loop.md` (the loop diagram)
@@ -23,9 +26,12 @@ python/
 ├── AGENTS.md                              # portable stub for non-Claude agents; points at CLAUDE.md
 ├── WORKFLOW.md                            # human-facing loop walkthrough (start here)
 ├── pyproject.toml                         # uv + ruff + mypy + pytest config
-├── .pre-commit-config.yaml                # ruff + mypy on every commit
+├── .gitignore                             # Python ignores, incl. .env* (.env.*.example kept)
+├── .pre-commit-config.yaml                # no-commit-to-main + secret scan + ruff + mypy
 ├── .claude/
-│   ├── settings.json                      # PostToolUse hook: ruff format + ruff check + mypy
+│   ├── settings.json                      # SessionStart branch check + PostToolUse ruff/mypy
+│   ├── hooks/
+│   │   └── branch-check.sh                # SessionStart: warn when a session opens on main
 │   ├── agents/
 │   │   ├── planner.md                     # Spec → markdown plan; read-only
 │   │   ├── test-first.md                  # Write failing pytest tests; never implements
@@ -52,6 +58,13 @@ python/
 │       │   └── SKILL.md                   # Auto-invoked on new public symbols
 │       └── dependency-hygiene/
 │           └── SKILL.md                   # Auto-invoked when pyproject.toml adds a dep
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml                         # CI gate: ruff + mypy + pytest on every PR
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── feature.yml                    # feature issue form; fields feed the spec
+│   │   └── bug.yml                        # bug issue form
+│   └── pull_request_template.md           # PR body carrying the Closes #N line
 ├── docs/specs/
 │   └── README.md                          # Spec numbering, status vocabulary, optional sections
 └── subdir-CLAUDE.md.example               # Per-area CLAUDE.md template
@@ -66,7 +79,10 @@ bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
 ```
 
 The script copies everything except this README, itself, and
-`subdir-CLAUDE.md.example`. Existing files are skipped, not overwritten.
+`subdir-CLAUDE.md.example`. On a first run, existing files are skipped,
+not overwritten. Re-run with `--update` to refresh the managed
+scaffolding (everything except the project-owned `CLAUDE.md`,
+`pyproject.toml`, and `.gitignore`) to the current template.
 
 After bootstrap:
 
@@ -106,6 +122,7 @@ After bootstrap:
 | --- | --- | --- |
 | Scope check (optional pre-spec) | You answer five forcing questions; output feeds the spec | `/scope-check <desc>` |
 | Spec | You write `docs/specs/NNNN-<feature>.md` (seeded with status header) | `/spec <name>` |
+| Branch | Main session creates `<issue#>-<slug>` (or `<type>/<slug>`) automatically — see CLAUDE.md "Git workflow" | — |
 | Plan | `planner` subagent (`.claude/agents/planner.md`) | `/plan [spec-path]` |
 | Test-first | `test-first` subagent (`.claude/agents/test-first.md`) | `/test-first [spec-path]` |
 | Implement | Main Claude session (CLAUDE.md tells it the rules) | — |
@@ -115,6 +132,7 @@ After bootstrap:
 | Verify (adversarial — pair with `/review` on meaningful PRs) | `reviewer-adversarial` subagent (`.claude/agents/reviewer-adversarial.md`) | `/review-adversarial [<base>..<head>]` |
 | Verify (security) | `security-reviewer` (opt-in subagent) | `/security [<base>..<head>]` |
 | Verify (performance) | `performance-reviewer` (opt-in subagent) | `/performance [<base>..<head>]` |
+| CI gate (every PR) | GitHub Actions runs ruff + mypy + pytest — the non-skippable backstop | `.github/workflows/ci.yml` |
 | Status overview (any time) | Aggregates `**Status:**` over all specs under `docs/specs/` | `/specs-status [filter]` |
 
 On multi-day features, append a `## Phase handoff` section to the spec

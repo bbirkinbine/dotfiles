@@ -43,6 +43,49 @@ points back here.
 - **Logging:** `structlog`, not `print` or `logging` directly. Get a
   logger via `log = structlog.get_logger()`.
 
+## Your role: orchestrator
+
+You are the orchestrator for this repo — not only a coder. Your standing
+job is to hold the high-level goal (the active spec) and drive the loop,
+delegating focused or verbose work to subagents so your own context
+stays clean enough to keep that goal in view. Context that fills with
+raw test output and file dumps is context that has lost the plot.
+
+Two distinct reasons to delegate — both matter:
+
+- **Independence.** A reviewer that has already seen the implementation
+  reasoning is not an independent reviewer. Hand the diff to a fresh
+  subagent that has not.
+- **Context hygiene.** Verbose work — codebase-wide searches, full test
+  output, doc fetches, log scraping — burns the context you need for
+  the goal. Push it into a subagent; only the summary returns.
+
+Delegation decision rules — apply these without being asked:
+
+| Situation | Route to |
+| --- | --- |
+| Task touches > 3 files, or you'd say "go figure out X and report back" | `/plan` — the `planner` subagent |
+| About to implement anything past trivial | `/test-first` before any implementation code |
+| Implementation done and `/review-check` is green | `/review` (and `/review-adversarial` on meaningful features) |
+| Need full pytest output, a wide codebase survey, or doc fetches | A subagent — keep the verbose output out of your own context |
+| A change would touch > 5 files | Stop and ask the human first |
+
+**Re-anchor on the spec.** `docs/specs/NNNN-*.md` is the source of truth
+for *what* you are building. Re-read the active spec at the start of
+each phase, and any time the conversation has drifted from it. If your
+context is getting long mid-feature, that is the signal to stop at a
+phase boundary and `/clear` — see `WORKFLOW.md` → "Phase handoff".
+
+Scale the loop to the task — heavyweight process on trivial work is its
+own failure mode:
+
+| Task size | The loop |
+| --- | --- |
+| Trivial — rename, typo, ≤ ~10 lines | Branch optional; skip spec and plan; just do it. |
+| Small — one function, one file | Branch; spec = one sentence; skip `/plan`; `/test-first` still required. |
+| Medium — 3–10 files | Full loop. |
+| Large — refactor or new subsystem | Full loop; split into medium tasks; do not run it all in one session. |
+
 ## Workflow expectations (Spec → Plan → Test-first → Implement → Verify)
 
 This is the agentic loop documented in
@@ -63,8 +106,10 @@ open-ended.
 - **Test-first.** Tests come before implementation. Use the `test-first`
   subagent to write failing pytest tests from the spec. Show me the
   failing-test output. Only then proceed to implementation.
-- **Implement.** Main session writes the minimum code to make the
-  tests pass. Any value or claim whose correctness depends on matching
+- **Implement.** You must already be on a feature branch — see
+  **Git workflow** below; never implement on `main`. Main session
+  writes the minimum code to make the tests pass. Any value or claim
+  whose correctness depends on matching
   an external authority — listed in the spec's `## External references`
   section — must be populated by `WebFetch` in-session with the source
   URL + retrieval date + license pinned in a header comment near where
@@ -91,6 +136,46 @@ open-ended.
   the U-curve degrades review quality; the handoff section is how the
   fresh session picks up without re-deriving context from the chat.
 - If a change would touch > 5 files, stop and ask first.
+
+## Git workflow
+
+The standing rule: **every change happens on its own branch — never
+write feature or fix code on `main`.** Create the branch yourself, as
+soon as there is a spec or an issue to work. Do not wait to be asked;
+branching is not an optional courtesy step.
+
+**Branch naming:**
+
+- Work tracked by a GitHub issue → `<issue-number>-<slug>`, e.g.
+  `42-add-user-prefs`. Create it with
+  `gh issue develop <N> --name <N>-<slug> --checkout`, which links the
+  branch to the issue in GitHub's UI. Plain `git switch -c <N>-<slug>`
+  also works but loses that linkage.
+- Untracked tiny work with no issue — XS fixes, chores, hotfixes →
+  `<type>/<slug>`, where `<type>` is one of `feat` `fix` `chore` `docs`
+  `refactor`, e.g. `chore/bump-ruff`. Do not invent a fake issue
+  number.
+- Anything past XS should get a GitHub issue first — issues are the
+  cross-session persistence layer. The spec number, the issue number,
+  and the branch number are the same number; that shared id ties
+  spec ↔ issue ↔ branch ↔ PR together.
+
+One branch per spec / unit of work.
+
+**Before the Implement phase**, check `git branch --show-current`. If it
+returns `main` or `master`, stop and create the branch first. Two
+guardrails back this up — the `no-commit-to-branch` pre-commit hook
+blocks commits on `main`, and a SessionStart hook warns when a session
+opens on `main` — but a guardrail firing means the branch was created
+too late. Branch at the right time; treat the guardrails as a backstop.
+
+**Pull requests.** Open with `gh pr create --fill --web`. The PR body
+must contain a closing keyword line — `Closes #<issue-number>` — so the
+merge auto-closes the issue. Closing keywords work in the PR body, not
+in feature-branch commit messages. Run `/review` before opening the PR.
+
+Commit *message* style is unchanged — see "Code / commit style" below.
+This section governs branches and PRs only.
 
 ## Subagents (in `.claude/agents/`)
 
@@ -168,10 +253,24 @@ instead of manual invocation.
 after every `Edit`/`Write` via a PostToolUse hook. Fix lint/type errors
 immediately rather than declaring victory with a broken build.
 
+A SessionStart hook (`.claude/hooks/branch-check.sh`) warns when a
+session opens on `main`/`master` — your cue to branch before
+implementing. The `no-commit-to-branch` hook in
+`.pre-commit-config.yaml` mechanically blocks `git commit` on
+`main`/`master`; the one expected exception is the day-zero scaffolding
+commit (`git commit --no-verify`). `.pre-commit-config.yaml` also runs
+secret scanning (`gitleaks`, `detect-private-key`) — the "never commit
+credentials" rule made mechanical rather than left to vigilance.
+
 The full local gate (lint + format + types + tests) is gated behind the
 explicit `/review-check` slash command, not the auto-hook — tests are
 too slow to run on every edit but they're non-optional before invoking
 `/review`.
+
+CI (`.github/workflows/ci.yml`) runs the full gate — ruff, mypy,
+pytest — on every pull request. It is the non-skippable backstop: local
+hooks and `/review-check` can be bypassed, CI cannot. A red CI check
+means the PR is not mergeable.
 
 ## Don't-touch list
 

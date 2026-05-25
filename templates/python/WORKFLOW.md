@@ -44,6 +44,12 @@ Then, in order:
    Verify the PostToolUse hook works by making a trivial edit; you should
    see `ruff format`, `ruff check`, and `mypy` run.
 
+   `pre-commit install` also activates the `no-commit-to-branch`
+   guardrail. The initial scaffolding commit lands on `main` — that is
+   the one expected commit there; make it before `pre-commit install`,
+   or with `git commit --no-verify`. Every change after that goes on a
+   branch.
+
 ## Per-feature loop
 
 Each step is a separate turn. The slash commands enforce that — every
@@ -59,6 +65,10 @@ phase on its own. You decide whether to advance.
         ↓
 [edit the spec]                    # goal, success criteria, non-goals;
                                    # one paragraph minimum
+        ↓
+[create the branch]                # <issue#>-<slug> for issue-tracked work; else
+                                   # <type>/<slug>. The agent branches itself —
+                                   # never run the loop on main.
         ↓
 /plan                              # planner subagent reads spec + codebase
         ↓
@@ -104,6 +114,11 @@ phase on its own. You decide whether to advance.
 - **Skipping the spec.** `/plan` becomes guess-the-feature; `/review`
   has no anchor to compare against. The reviewer's first check is "does
   the diff match the spec?" — with no spec, it can't run that check.
+- **Implementing on `main`.** Skip the branch step and the whole loop
+  runs on `main`. The `no-commit-to-branch` guardrail then blocks the
+  commit at the *end* — after the work is done, which is the worst time
+  to discover it. Branch right after the spec exists; the SessionStart
+  hook warning is the early reminder.
 - **Skipping `test-first`.** You'll write the implementation first and
   then "tests" that match what you happened to build, not what the spec
   says. Tautological tests pass everything, including the bugs.
@@ -196,6 +211,10 @@ skip `/review` if you're the only reviewer. Scale the loop to the work.
   auto-invoked even after you install them; the slash command is the
   trigger. Treat `/security` and `/performance` as a deliberate gate per
   PR, not a passive background check.
+- **CI is the non-skippable gate.** `bootstrap.sh` installs
+  `.github/workflows/ci.yml` — ruff + mypy + pytest on every PR. Local
+  hooks and `/review-check` can be bypassed; CI cannot. Red CI means the
+  PR is not done, whatever the local gate said.
 
 ## Reference
 

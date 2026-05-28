@@ -68,3 +68,7 @@ node_modules/
 .python-version
 .tool-versions
 
+
+**/.claude/settings.local.json
+
+**/.claude/settings.local.json

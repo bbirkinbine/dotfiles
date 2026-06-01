@@ -21,12 +21,14 @@
 #   - CLAUDE.md, WORKFLOW.md, AGENTS.md, pyproject.toml, .gitignore,
 #     .pre-commit-config.yaml
 #   - the .claude/ tree: settings.json + the branch-check SessionStart
-#     hook + the default subagents (planner / test-first / reviewer /
+#     hook + the block-destructive PreToolUse hook + the default
+#     subagents (planner / test-first / reviewer /
 #     reviewer-adversarial) + the default skills (python-module-split /
 #     python-docstrings / dependency-hygiene) + the default slash
 #     commands (spec, specs-status, scope-check, plan, test-first,
 #     review-check, review, review-adversarial, security, performance)
 #   - docs/specs/README.md — the specs convention
+#   - docs/agent-handoff.md — operational runbook stub (project-owned)
 #   - the .github/ tree: CI workflow, PR template, issue forms
 #
 # What it does NOT copy:
@@ -121,6 +123,7 @@ sync() {
 copy CLAUDE.md
 copy pyproject.toml
 copy .gitignore
+copy docs/agent-handoff.md
 
 # --- managed: refreshed by --update ---
 sync WORKFLOW.md
@@ -128,6 +131,7 @@ sync AGENTS.md
 sync .pre-commit-config.yaml
 sync .claude/settings.json
 sync .claude/hooks/branch-check.sh
+sync .claude/hooks/block-destructive.sh
 sync .claude/agents/planner.md
 sync .claude/agents/test-first.md
 sync .claude/agents/reviewer.md

@@ -56,6 +56,14 @@ dotfiles repo stands alone on a machine without the vault checked out.
       ```
 - [ ] Write your first spec: `docs/specs/0001-<feature>.md`. See
       `docs/specs/README.md` (copied by bootstrap) for the convention.
+- [ ] Fill in `docs/agent-handoff.md` (dropped by bootstrap as a
+      project-owned stub). It's the operational runbook companion to
+      `CLAUDE.md` — known risks, accepted commands, rollback playbook,
+      "when X breaks." Mostly empty on day zero; populated as the
+      project collects landmines. Delete sections that don't apply yet
+      rather than leave them as stub placeholders. Don't mirror
+      CLAUDE.md's "Open work / current state" here — the handoff points
+      back to it.
 
 ### If this is a non-Python repo (infra, FPGA, shell, etc.)
 

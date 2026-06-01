@@ -29,9 +29,10 @@ python/
 ├── .gitignore                             # Python ignores, incl. .env* (.env.*.example kept)
 ├── .pre-commit-config.yaml                # no-commit-to-main + secret scan + ruff + mypy
 ├── .claude/
-│   ├── settings.json                      # SessionStart branch check + PostToolUse ruff/mypy
+│   ├── settings.json                      # SessionStart branch check + PreToolUse deny-list + PostToolUse ruff/mypy
 │   ├── hooks/
-│   │   └── branch-check.sh                # SessionStart: warn when a session opens on main
+│   │   ├── branch-check.sh                # SessionStart: warn when a session opens on main
+│   │   └── block-destructive.sh           # PreToolUse: block unrecoverable cmds (rm -rf /, git clean -fd, mkfs, dd, terraform destroy, etc.)
 │   ├── agents/
 │   │   ├── planner.md                     # Spec → markdown plan; read-only
 │   │   ├── test-first.md                  # Write failing pytest tests; never implements
@@ -65,8 +66,10 @@ python/
 │   │   ├── feature.yml                    # feature issue form; fields feed the spec
 │   │   └── bug.yml                        # bug issue form
 │   └── pull_request_template.md           # PR body carrying the Closes #N line
-├── docs/specs/
-│   └── README.md                          # Spec numbering, status vocabulary, optional sections
+├── docs/
+│   ├── agent-handoff.md                   # Operational runbook (project-owned; current state, risks, rollback)
+│   └── specs/
+│       └── README.md                      # Spec numbering, status vocabulary, optional sections
 └── subdir-CLAUDE.md.example               # Per-area CLAUDE.md template
                                             # (copied manually, not by bootstrap)
 ```

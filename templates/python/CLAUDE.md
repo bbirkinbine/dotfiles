@@ -253,6 +253,22 @@ instead of manual invocation.
 after every `Edit`/`Write` via a PostToolUse hook. Fix lint/type errors
 immediately rather than declaring victory with a broken build.
 
+A PreToolUse hook (`.claude/hooks/block-destructive.sh`) runs before
+every `Bash` call and blocks catastrophic / unrecoverable commands —
+`rm -rf /` (and `~`, `$HOME`, `*`), `git clean -fd`, `git filter-repo`,
+`mkfs.* /dev/...`, `dd of=/dev/...`, `terraform destroy`,
+`gh repo delete`, `DROP TABLE` on a DB client, `chmod 777 /`,
+`shutdown`, forkbombs, and a few more. The line it draws is
+*unrecoverable*: things the reflog, a re-clone, or `git revert` can't
+bring back. Deliberately **not** on the list are operations that are
+recoverable or already policy-gated — `git push --force` (gated by the
+explicit-approval rule above) and `git reset --hard` (recoverable via
+the reflog) are covered by policy, not by this mechanical backstop, so
+the deny-list stays narrow and false-positive-free. To bypass for a
+legitimate need, run the command outside the agent session or
+temporarily disable the hook in `.claude/settings.json`; do not
+silently edit the deny-list to allow a one-off.
+
 A SessionStart hook (`.claude/hooks/branch-check.sh`) warns when a
 session opens on `main`/`master` — your cue to branch before
 implementing. The `no-commit-to-branch` hook in

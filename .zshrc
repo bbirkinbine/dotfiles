@@ -39,4 +39,4 @@ export KEEPASSXC_DB="$HOME/Downloads/keepass/homelab.kdbx"
 # homelab: hmac yubikey slot 2 configured for opentofu hydrate
 export KEEPASSXC_YUBIKEY=2
 # homelab stuff
-export NODES='pve13t pve13m pve12t'
+export NODES='pve13t pve13m pve12t pve12t2'

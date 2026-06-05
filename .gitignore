@@ -1,0 +1,10 @@
+# Secrets and machine-local overrides — never tracked.
+# Real secrets live in ~/.env (outside this repo) and are sourced by
+# .zshrc; this is the safety net in case a secret-bearing file ever
+# lands inside the repo directory.
+.env
+.env.*
+!.env.example
+*.local
+.zshrc.local
+.zprofile.local

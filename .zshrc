@@ -40,3 +40,9 @@ export KEEPASSXC_DB="$HOME/Downloads/keepass/homelab.kdbx"
 export KEEPASSXC_YUBIKEY=2
 # homelab stuff
 export NODES='pve13t pve13m pve12t pve12t2'
+
+# OpenClaw Completion
+[ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# secrets
+[[ -f ~/.env ]] && source ~/.env

@@ -211,6 +211,12 @@ skip `/review` if you're the only reviewer. Scale the loop to the work.
   auto-invoked even after you install them; the slash command is the
   trigger. Treat `/security` and `/performance` as a deliberate gate per
   PR, not a passive background check.
+- **The Stop hook enforces the gate automatically.** Once `src/` has
+  pending changes, the session can't end a turn while ruff/mypy/pytest are
+  red — `.claude/hooks/gate-on-stop.sh` returns `decision: block`. This is
+  the `/review-check` discipline made mechanical, so "I forgot to run the
+  gate" stops being a failure mode. It does not run on a clean tree and
+  steps aside rather than looping when a gate can't pass.
 - **CI is the non-skippable gate.** `bootstrap.sh` installs
   `.github/workflows/ci.yml` — ruff + mypy + pytest on every PR. Local
   hooks and `/review-check` can be bypassed; CI cannot. Red CI means the

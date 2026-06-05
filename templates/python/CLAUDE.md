@@ -94,6 +94,17 @@ in my Obsidian vault. The human-facing walkthrough with worked examples
 lives in `WORKFLOW.md` at the repo root. Honor each phase — don't run
 open-ended.
 
+**Autodrive between checkpoints.** When handed a spec to implement (a
+`docs/specs/NNNN-*.md` path, or `implement <feature>`), drive the loop
+yourself end to end — branch, `/test-first`, implement to green,
+`/review-check` — without waiting for a per-phase prompt. Stop and surface
+output at exactly two human checkpoints: after `/plan` (before tests), and
+after `/review-check` passes (before commit). Never commit on your own (see
+Git workflow and Code / commit style). If `/test-first` or the gate shows
+the spec is wrong, stop and raise it rather than coding around it. This
+applies to Medium and Large tasks; Trivial and Small keep the scaled-down
+loop above.
+
 - **Spec.** Before any non-trivial work, write a short spec under
   `docs/specs/NNNN-<feature>.md` (see `docs/specs/README.md` for the
   numbering convention and required sections, including
@@ -252,6 +263,15 @@ instead of manual invocation.
 `.claude/settings.json` runs `ruff format`, `ruff check`, and `mypy`
 after every `Edit`/`Write` via a PostToolUse hook. Fix lint/type errors
 immediately rather than declaring victory with a broken build.
+
+A `Stop` hook (`.claude/hooks/gate-on-stop.sh`) fires when the session
+tries to finish a turn. If `src/` has pending changes and `ruff`/`mypy`/
+`pytest` don't all pass, it returns `decision: block` so the session cannot
+declare done on a red gate — the `/review-check` discipline made automatic.
+Two guards keep it quiet: it does nothing when `src/` has no pending
+changes, and it steps aside (with a warning) if a gate genuinely can't pass
+rather than looping. It backstops the case where you forget to run
+`/review-check`; it does not replace `/review`.
 
 A PreToolUse hook (`.claude/hooks/block-destructive.sh`) runs before
 every `Bash` call and blocks catastrophic / unrecoverable commands —

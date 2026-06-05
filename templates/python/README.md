@@ -29,10 +29,11 @@ python/
 ├── .gitignore                             # Python ignores, incl. .env* (.env.*.example kept)
 ├── .pre-commit-config.yaml                # no-commit-to-main + secret scan + ruff + mypy
 ├── .claude/
-│   ├── settings.json                      # SessionStart branch check + PreToolUse deny-list + PostToolUse ruff/mypy
+│   ├── settings.json                      # SessionStart branch check + PreToolUse deny-list + PostToolUse ruff/mypy + Stop gate
 │   ├── hooks/
 │   │   ├── branch-check.sh                # SessionStart: warn when a session opens on main
-│   │   └── block-destructive.sh           # PreToolUse: block unrecoverable cmds (rm -rf /, git clean -fd, mkfs, dd, terraform destroy, etc.)
+│   │   ├── block-destructive.sh           # PreToolUse: block unrecoverable cmds (rm -rf /, git clean -fd, mkfs, dd, terraform destroy, etc.)
+│   │   └── gate-on-stop.sh                # Stop: block turn-end while ruff/mypy/pytest are red and src/ has pending changes
 │   ├── agents/
 │   │   ├── planner.md                     # Spec → markdown plan; read-only
 │   │   ├── test-first.md                  # Write failing pytest tests; never implements
@@ -131,6 +132,7 @@ After bootstrap:
 | Implement | Main Claude session (CLAUDE.md tells it the rules) | — |
 | Per-edit quality | PostToolUse hook (`.claude/settings.json`) runs ruff format + ruff check + mypy on every Edit/Write | — |
 | Local quality gate (pre-review) | ruff lint + format + mypy + pytest, refuses pass on failure | `/review-check` |
+| Turn-end gate (automatic) | Stop hook (`.claude/hooks/gate-on-stop.sh`) blocks finishing a turn while ruff/mypy/pytest are red and `src/` has pending changes — `/review-check` made mechanical | — |
 | Verify (collaborative) | `reviewer` subagent (`.claude/agents/reviewer.md`) | `/review [<base>..<head>]` |
 | Verify (adversarial — pair with `/review` on meaningful PRs) | `reviewer-adversarial` subagent (`.claude/agents/reviewer-adversarial.md`) | `/review-adversarial [<base>..<head>]` |
 | Verify (security) | `security-reviewer` (opt-in subagent) | `/security [<base>..<head>]` |

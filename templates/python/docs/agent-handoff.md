@@ -121,6 +121,11 @@ self-contained.}}
   `no-commit-to-branch` blocks `main`. Branch first.
 - **PostToolUse hook fights the editor** — editor's ruff settings differ
   from `pyproject.toml`. Align them — `pyproject.toml` wins.
+- **Session won't end its turn** — the Stop hook (`gate-on-stop.sh`) is
+  holding it: `src/` has pending changes and ruff/mypy/pytest aren't all
+  green. Run `/review-check`, fix the failures. A gate that genuinely
+  can't pass is let through on the second attempt (with a warning on
+  stderr).
 - **PreToolUse deny-list blocks a command you actually need** — confirm
   it's truly unrecoverable; if not, the deny-list pattern is wrong (fix
   it). If it is, run outside the agent session.

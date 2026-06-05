@@ -21,7 +21,8 @@
 #   - CLAUDE.md, WORKFLOW.md, AGENTS.md, pyproject.toml, .gitignore,
 #     .pre-commit-config.yaml
 #   - the .claude/ tree: settings.json + the branch-check SessionStart
-#     hook + the block-destructive PreToolUse hook + the default
+#     hook + the block-destructive PreToolUse hook + the gate-on-stop
+#     Stop hook + the default
 #     subagents (planner / test-first / reviewer /
 #     reviewer-adversarial) + the default skills (python-module-split /
 #     python-docstrings / dependency-hygiene) + the default slash
@@ -132,6 +133,7 @@ sync .pre-commit-config.yaml
 sync .claude/settings.json
 sync .claude/hooks/branch-check.sh
 sync .claude/hooks/block-destructive.sh
+sync .claude/hooks/gate-on-stop.sh
 sync .claude/agents/planner.md
 sync .claude/agents/test-first.md
 sync .claude/agents/reviewer.md

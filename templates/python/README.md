@@ -69,6 +69,8 @@ python/
 │   └── pull_request_template.md           # PR body carrying the Closes #N line
 ├── docs/
 │   ├── agent-handoff.md                   # Operational runbook (project-owned; current state, risks, rollback)
+│   ├── workflow-diagram.md                # Visual map of the agentic loop (Mermaid; managed)
+│   ├── serena-setup.md                    # Optional serena MCP — install / verify / update / teardown (managed)
 │   └── specs/
 │       └── README.md                      # Spec numbering, status vocabulary, optional sections
 └── subdir-CLAUDE.md.example               # Per-area CLAUDE.md template

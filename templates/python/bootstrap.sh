@@ -29,6 +29,8 @@
 #     commands (spec, specs-status, scope-check, plan, test-first,
 #     review-check, review, review-adversarial, security, performance)
 #   - docs/specs/README.md — the specs convention
+#   - docs/workflow-diagram.md — visual map of the agentic loop
+#   - docs/serena-setup.md — optional serena MCP install/verify runbook
 #   - docs/agent-handoff.md — operational runbook stub (project-owned)
 #   - the .github/ tree: CI workflow, PR template, issue forms
 #
@@ -152,6 +154,8 @@ sync .claude/skills/python-module-split/SKILL.md
 sync .claude/skills/python-docstrings/SKILL.md
 sync .claude/skills/dependency-hygiene/SKILL.md
 sync docs/specs/README.md
+sync docs/workflow-diagram.md
+sync docs/serena-setup.md
 sync .github/workflows/ci.yml
 sync .github/pull_request_template.md
 sync .github/ISSUE_TEMPLATE/feature.yml

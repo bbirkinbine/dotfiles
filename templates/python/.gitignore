@@ -26,6 +26,10 @@ htmlcov/
 
 # uv manages the lockfile — uv.lock IS committed; do not ignore it.
 
+# serena MCP (optional, opt-in) — local symbol cache + project config.
+# Machine-specific; regenerated on first run. See docs/serena-setup.md.
+.serena/
+
 # OS / editor cruft
 .DS_Store
 *.swp

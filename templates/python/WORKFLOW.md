@@ -36,6 +36,12 @@ Then, in order:
      copy `performance-reviewer`.
    - Add a one-line mention of each enabled subagent to the "Subagents"
      section of `CLAUDE.md` so the agent knows when to route to it.
+   - **Large or long-lived codebase you'll revisit across many sessions**
+     (not a fresh small repo) → enable the `serena` MCP for symbol-level
+     navigation. Skip it on small single-language repos — see
+     `CLAUDE.md` → "Code navigation" for the when/whether (and the
+     skip-by-default rule), and `docs/serena-setup.md` for the install
+     and verification steps.
 4. **Install the dev environment.**
    ```bash
    uv sync
@@ -225,6 +231,9 @@ skip `/review` if you're the only reviewer. Scale the loop to the work.
 ## Reference
 
 - `CLAUDE.md` — the rules the agent follows every turn
+- `docs/workflow-diagram.md` — the same loop as a rendered visual map
+  (Mermaid): the per-feature loop, the automation/guardrail layer, and
+  the subagent-delegation model
 - `docs/specs/README.md` — spec numbering + minimum shape
 - `~/Downloads/src/dotfiles/templates/new-project-checklist.md` —
   pre-flight checklist for the day-zero setup

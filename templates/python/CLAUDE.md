@@ -68,6 +68,7 @@ Delegation decision rules — apply these without being asked:
 | About to implement anything past trivial | `/test-first` before any implementation code |
 | Implementation done and `/review-check` is green | `/review` (and `/review-adversarial` on meaningful features) |
 | Need full pytest output, a wide codebase survey, or doc fetches | A subagent — keep the verbose output out of your own context |
+| "Who calls this?" / symbol nav on a *large* repo, with `serena` enabled | The `serena` MCP — query the index, don't grep-storm. See "Code navigation" |
 | A change would touch > 5 files | Stop and ask the human first |
 
 **Re-anchor on the spec.** `docs/specs/NNNN-*.md` is the source of truth
@@ -91,8 +92,9 @@ own failure mode:
 This is the agentic loop documented in
 `Research/Programming/Agentic Programming/02 Agentic Methodology Loop.md`
 in my Obsidian vault. The human-facing walkthrough with worked examples
-lives in `WORKFLOW.md` at the repo root. Honor each phase — don't run
-open-ended.
+lives in `WORKFLOW.md` at the repo root; a rendered diagram of the whole
+machine — loop, guardrails, and subagent delegation — is in
+`docs/workflow-diagram.md`. Honor each phase — don't run open-ended.
 
 **Autodrive between checkpoints.** When handed a spec to implement (a
 `docs/specs/NNNN-*.md` path, or `implement <feature>`), drive the loop
@@ -187,6 +189,28 @@ in feature-branch commit messages. Run `/review` before opening the PR.
 
 Commit *message* style is unchanged — see "Code / commit style" below.
 This section governs branches and PRs only.
+
+## Code navigation (optional: `serena` MCP)
+
+Default to the built-in tools — `grep` / `glob` / `read`, with a subagent
+for wide surveys. For a single-language repo that fits in a context
+window that is enough: an index layer buys clarity, not token savings,
+and adds a moving part. **Do not enable `serena` on a fresh or small
+repo** — the payoff scales with corpus size and how often you re-query.
+
+Enable the `serena` MCP only once a repo is **large or long-lived** —
+when the agent burns most of its turns re-reading files to rebuild the
+same structural map every session. `serena` is LSP / symbol-level, so
+there is no stale graph file to maintain (it resolves symbols live), and
+it exposes find-symbol / find-referencing-symbols / "who calls this?"
+over MCP. When enabled, prefer a `serena` symbol query over a repo-wide
+grep for navigation — see the delegation table in "Your role:
+orchestrator."
+
+Setup, verification (new or existing), update/pin, and teardown:
+[`docs/serena-setup.md`](docs/serena-setup.md). Rationale and tool
+comparison: `Research/Programming/Code Graphs for Coding Agents — Cheat
+Sheet.md` in my Obsidian vault.
 
 ## Subagents (in `.claude/agents/`)
 

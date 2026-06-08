@@ -32,17 +32,11 @@ export PATH="$HOME/.venv-vllm-metal/bin:$PATH"
 # allow zsh commands that end with a # something here to work
 setopt interactivecomments
 
-# homelab
-# dedicated keepass just for the homelab
-# homelab spins up openbau vault but needs layer 0 (Turtles all the way down)
-export KEEPASSXC_DB="$HOME/Downloads/keepass/homelab.kdbx"
-# homelab: hmac yubikey slot 2 configured for opentofu hydrate
-export KEEPASSXC_YUBIKEY=2
-# homelab stuff
-export NODES='pve13t pve13m pve12t pve12t2'
-
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# machine-local overrides (homelab, host-specific) — untracked, see ~/.zshrc.local
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # secrets
 [[ -f ~/.env ]] && source ~/.env

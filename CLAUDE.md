@@ -15,16 +15,17 @@ directory of reusable boilerplate (`CLAUDE.md`, `README.md`, GitHub About
 checklist, new-project checklist) used when bootstrapping new repos under
 `~/Downloads/src/`.
 
-This repo is **private** on GitHub (`github.com/bbirkinbine/dotfiles`) as
-of 2026-06-05 — it was public before that. The public-repo hygiene rules
-below are **kept deliberately as defense-in-depth**: git history is
-forever, the repo could flip back to public, gain collaborators, or be
-breached, and the rules cost nothing to follow. Treat them as the default
-posture, with two practical relaxations the private status now allows:
-internal homelab hostnames (e.g. `NODES`) are acceptable, and `.zshrc`
-may *reference* machine-local secret files. Live secret **values** still
-never get committed — they live in `~/.env` (outside this repo) and are
-sourced at runtime; see "Secrets and public-repo hygiene" below.
+This repo is **public** on GitHub (`github.com/bbirkinbine/dotfiles`) as
+of 2026-06-08 — it was private from 2026-06-05 until then, and public
+before that. Treat it as world-readable: the public-repo hygiene rules
+below are the default posture, not defense-in-depth. Machine-specific
+config that only makes sense on one host — homelab node names
+(`NODES`), the KeePass/YubiKey vars — lives in an untracked override
+(`~/.zshrc.local`) that `.zshrc` sources at runtime; it is never
+committed here. Live secret **values** likewise live only in `~/.env`
+(outside this repo); `.zshrc` may *reference* those local files but
+never contains their values. See "Secrets and public-repo hygiene"
+below.
 
 ---
 

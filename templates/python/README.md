@@ -5,7 +5,7 @@ Mirrors the destination structure exactly — `bootstrap.sh` just `cp -r`s
 the files into place.
 
 This directory **is the source of truth** for the agentic-workflow
-scaffolding, version-controlled in the private dotfiles repo
+scaffolding, version-controlled in the dotfiles repo
 (`github.com/bbirkinbine/dotfiles`). It used to be mirrored into the
 Obsidian vault under
 `Research/Programming/Agentic Programming/starter-files/`; that mirror

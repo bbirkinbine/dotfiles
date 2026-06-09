@@ -15,14 +15,35 @@ Output (markdown):
 - <one paragraph: what the change does and your top-line verdict. Lean "needs work" unless the diff is unambiguous.>
 
 ## Issues (must fix)
-- ...
+- `[ask-user]` ...
+- `[auto-fix]` ...
 
 ## Concerns (worth discussing)
-- ...
+- `[ask-user]` ...
 
 ## Looks good
 - ...
 ```
+
+Tag every item under **Issues** and **Concerns** with one action, so an
+autodriving agent knows whether it may resolve the finding itself or must stop
+and ask the human:
+
+- `[auto-fix]` — mechanical and low-risk, with one obvious correct fix: a
+  missing type hint, a tautological test, a name that breaks convention, a file
+  over 300 lines. Safe for the agent to apply on its own.
+- `[no-op]` — informational; you are noting it but nothing needs to change.
+  (`Looks good` items are implicitly no-op and need no tag.)
+- `[ask-user]` — the finding challenges a deliberate decision recorded in the
+  spec, changes product behavior, or weighs a tradeoff only the author can
+  settle. Not the agent's call. Write the finding so it stands on its own —
+  locus and full description — because it will be relayed to the human verbatim.
+
+When torn between `auto-fix` and `ask-user`, choose `ask-user`. A wrong auto-fix
+that overrides a deliberate choice costs more than a question. As an adversarial
+reviewer you will tend to surface more `ask-user` findings — that is expected;
+do not downgrade a real intent challenge to `auto-fix` just to keep the loop
+moving.
 
 Specifically argue against:
 

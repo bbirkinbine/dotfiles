@@ -77,6 +77,14 @@ each phase, and any time the conversation has drifted from it. If your
 context is getting long mid-feature, that is the signal to stop at a
 phase boundary and `/clear` — see `WORKFLOW.md` → "Phase handoff".
 
+**Verify before you report.** `/review-check`, the Stop-gate hook, and
+CI mechanically verify the *code* — but a claim the gate can't see ("the
+scrub worked", "these two files are duplicates", "the service came back
+up") is only true once you have proven it. Before you state an outcome,
+run the concrete check that confirms it and show the output. "Looks
+done" with no command behind it is a guess, and a confident wrong claim
+costs more than the check would have.
+
 Scale the loop to the task — heavyweight process on trivial work is its
 own failure mode:
 
@@ -106,6 +114,19 @@ Git workflow and Code / commit style). If `/test-first` or the gate shows
 the spec is wrong, stop and raise it rather than coding around it. This
 applies to Medium and Large tasks; Trivial and Small keep the scaled-down
 loop above.
+
+**Handling review findings.** `/review` and `/review-adversarial` tag each
+Issue and Concern with an action: `[auto-fix]` (mechanical, one correct fix —
+apply it yourself, then re-run `/review-check`), `[no-op]` (informational —
+nothing to do), or `[ask-user]` (challenges a deliberate spec decision or
+changes product behavior — a call that is the human's, not yours). During
+autodrive, resolve `[auto-fix]` findings on your own and skip `[no-op]` ones,
+but an `[ask-user]` finding is a hard stop: surface it to the human verbatim —
+its locus and full description, not a paraphrase or a pre-judged answer — and
+wait. Autodrive consent covers mechanical progress and `[auto-fix]` findings;
+it does not extend to overriding the author's intent. The one exception is an
+explicit instruction to drive the entire run unattended ("just ship it", "don't
+check back"), which is standing consent to resolve `[ask-user]` findings too.
 
 - **Spec.** Before any non-trivial work, write a short spec under
   `docs/specs/NNNN-<feature>.md` (see `docs/specs/README.md` for the
@@ -142,6 +163,15 @@ loop above.
   on the same diff and read both side-by-side. Add `/security` and/or
   `/performance` if the relevant opt-in subagent is installed and the
   diff trips its triggers.
+- **Bug fixes — confirm the cause before the fix.** The loop above is
+  feature-shaped; a bug fix has a different failure mode: wiring up a fix
+  against a *guessed* cause. Reproduce the failure first, then have
+  `/test-first` write a test that fails *for the reason you believe is the
+  cause*. A reproducing test that fails for a different reason than your
+  hypothesis means the diagnosis is wrong — fix the diagnosis, not the
+  symptom. Don't commit until that test goes red → green. A fix committed
+  on a hunch is the revert-and-history-rewrite cycle the public-repo
+  hygiene section calls the expensive case.
 - **Phase handoff on multi-day features.** If the loop spans more than
   one session, append a `## Phase handoff` section to the spec at each
   phase boundary (state + entry conditions for the next phase), then

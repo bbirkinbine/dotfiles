@@ -13,24 +13,12 @@ Contents:
 - `.zprofile` — login shell config (Homebrew shellenv, OrbStack, JetBrains Toolbox)
 - `.gitconfig` — git identity, aliases, and defaults
 - `.gitignore_global` — global gitignore patterns
-- [`templates/`](templates/) — reusable boilerplate (`CLAUDE.md`, `README.md`,
-  GitHub About checklist, new-project checklist) for new repositories.
-  See [`templates/README.md`](templates/README.md).
 
-## Quick start — new project from this repo
-
-**Python project with the agentic workflow:**
-
-```bash
-cd ~/Downloads/src/new-project
-bash ~/Downloads/src/dotfiles/templates/python/bootstrap.sh
-```
-
-Then read [`templates/python/WORKFLOW.md`](templates/python/WORKFLOW.md) — day-zero checklist + per-feature loop walkthrough.
-
-**Non-Python repo:** copy [`templates/CLAUDE.md.template`](templates/CLAUDE.md.template) and [`templates/README.md.template`](templates/README.md.template), fill the `{{placeholders}}`, then walk [`templates/new-project-checklist.md`](templates/new-project-checklist.md).
-
-Either way: [`templates/README.md`](templates/README.md) is the flavor switchboard with more context.
+The project-bootstrap templates (`CLAUDE.md`/`README.md` boilerplate,
+new-project checklist, Python agentic-workflow scaffolding) that used to
+live under `templates/` here have moved to their own repo,
+`agentic-scaffold`. Their development history up to the move remains in
+this repo's git history.
 
 ## AI-assisted
 

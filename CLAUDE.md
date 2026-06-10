@@ -10,10 +10,10 @@
 ## What this repo is
 
 Personal shell and development-environment dotfiles for macOS — `.zshrc`,
-`.zprofile`, `.gitconfig`, `.gitignore_global` — plus a `templates/`
-directory of reusable boilerplate (`CLAUDE.md`, `README.md`, GitHub About
-checklist, new-project checklist) used when bootstrapping new repos under
-`~/Downloads/src/`.
+`.zprofile`, `.gitconfig`, `.gitignore_global`. The project-bootstrap
+templates that used to live under `templates/` moved to the
+`agentic-scaffold` repo (`~/Downloads/src/agentic-scaffold`) on
+2026-06-09; their pre-move history remains in this repo's git history.
 
 This repo is **public** on GitHub (`github.com/bbirkinbine/dotfiles`) as
 of 2026-06-08 — it was private from 2026-06-05 until then, and public
@@ -33,9 +33,6 @@ below.
 
 zsh + git on macOS (Apple Silicon, Homebrew). No build, no test suite, no
 deploy target — files here are consumed in place by the shell and by git.
-The `templates/` directory is the project-bootstrap surface; changes
-there propagate (by copy) to every new repo created from this machine, so
-treat edits in `templates/` as standards-setting rather than ad-hoc.
 
 **Out of scope:** machine-specific config (anything that wouldn't be safe
 on the open internet, anything that only makes sense on one host),
@@ -143,17 +140,16 @@ contents:
   trailers, period, unless the named person has explicitly signed off.
 - Author email on early commits. If a clone on a different machine had
   the wrong global `user.email`, every commit before the fix carries
-  it. Verify before the first commit — see
-  [`templates/new-project-checklist.md`](templates/new-project-checklist.md).
+  it. Verify before the first commit — see `new-project-checklist.md`
+  in the `agentic-scaffold` repo.
 - CI logs. Echoed env vars, full filesystem paths, and stack traces are
   all visible to anyone the moment the repo is public.
 - Screenshots embedded in PRs or `docs/`. Crop or blur anything showing
   real data, real hostnames, or filesystem layout.
 
-The pre-flip checklist in
-[`templates/new-project-checklist.md`](templates/new-project-checklist.md)
-applies here too — pre-flip scrubbing is cheap; post-flip scrubbing is
-expensive and incomplete.
+The pre-flip checklist in `new-project-checklist.md` (in the
+`agentic-scaffold` repo) applies here too — pre-flip scrubbing is cheap;
+post-flip scrubbing is expensive and incomplete.
 
 ---
 
@@ -178,15 +174,11 @@ Don't claim a change is "ready" without at least:
 ## Don't touch
 
 - `.git/` — obviously.
-- Files in `templates/` are standards-setting: a change there propagates
-  to every new repo bootstrapped from this machine. Edit deliberately
-  and explain the rationale in the commit message; don't tweak template
-  language casually.
 
 ---
 
-## Open work / current state (updated 2026-05-21)
+## Open work / current state (updated 2026-06-09)
 
-In-flight, not stable. The shell/git dotfiles see occasional tweaks
-(new tool on `PATH`, alias change); `templates/` is the more active
-surface as the project-bootstrap pattern evolves.
+In-flight, not stable. Scope is now dotfiles only: occasional tweaks
+(new tool on `PATH`, alias change). The project-bootstrap templates and
+their ongoing evolution live in the `agentic-scaffold` repo.

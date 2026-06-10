@@ -9,10 +9,11 @@ Personal shell and development-environment configuration for macOS.
 > **This repo is in-flight.**
 
 Contents:
-- `.zshrc` — interactive shell config (aliases, PATH, completions, direnv, vi mode)
+- `.zshrc` — interactive shell config (aliases, PATH, completions, history, direnv, vi mode, fzf/zoxide/starship integration)
 - `.zprofile` — login shell config (Homebrew shellenv, OrbStack, JetBrains Toolbox)
 - `.gitconfig` — git identity, aliases, and defaults
 - `.gitignore_global` — global gitignore patterns
+- `Brewfile` — packages the dotfiles expect (`brew bundle --file Brewfile` on a new machine)
 
 The project-bootstrap templates (`CLAUDE.md`/`README.md` boilerplate,
 new-project checklist, Python agentic-workflow scaffolding) that used to

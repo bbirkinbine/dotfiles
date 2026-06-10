@@ -35,6 +35,22 @@ setopt interactivecomments
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
 
+# history — zsh default keeps only 1000 lines; fzf ctrl-r needs more to be useful
+HISTSIZE=100000
+SAVEHIST=100000
+setopt SHARE_HISTORY        # merge history across open shells
+setopt HIST_IGNORE_ALL_DUPS # drop older duplicates of a repeated command
+setopt HIST_IGNORE_SPACE    # a leading space keeps a command out of history
+
+# fzf — ctrl-r fuzzy history search, ctrl-t fuzzy file insert
+command -v fzf >/dev/null && source <(fzf --zsh)
+
+# zoxide — frecency-ranked directory jumping: z <fragment>
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+
+# starship prompt
+command -v starship >/dev/null && eval "$(starship init zsh)"
+
 # machine-local overrides (homelab, host-specific) — untracked, see ~/.zshrc.local
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
